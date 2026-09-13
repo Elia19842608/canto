@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1E1714">
+<title>Studio Voce — Vocalizzi per baritono</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@400;500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --nero:#1E1714;
+  --pan:#2A211C;
+  --pan2:#372A23;
+  --bordo:#4A392F;
+  --osso:#F3EBE0;
+  --fumo:#A69485;
+  --ambra:#E8A33D;
+  --salvia:#86B49A;
+  --ruggine:#C4653F;
+  --r:10px;
+  --safe-b:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;background:var(--nero);color:var(--osso)}
+body{
+  font-family:"IBM Plex Sans",system-ui,-apple-system,sans-serif;
+  font-size:15px;line-height:1.55;
+  overscroll-behavior:none;
+}
+.cond{font-family:"IBM Plex Sans Condensed","IBM Plex Sans",system-ui,sans-serif}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
+:focus-visible{outline:2px solid var(--ambra);outline-offset:2px;border-radius:4px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+/* ---------- shell ---------- */
+#app{max-width:560px;margin:0 auto;min-height:100dvh;display:flex;flex-direction:column}
+.topbar{
+  display:flex;align-items:center;gap:12px;padding:14px 16px 10px;
+  border-bottom:1px solid var(--bordo);position:sticky;top:0;background:var(--nero);z-index:20
+}
+.topbar h1{
+  font-family:"IBM Plex Sans Condensed";font-size:17px;font-weight:600;margin:0;letter-spacing:.02em;flex:1
+}
+.topbar h1 span{color:var(--fumo);font-weight:400}
+.iconbtn{
+  width:38px;height:38px;display:grid;place-items:center;border:1px solid var(--bordo);
+  border-radius:var(--r);color:var(--fumo);flex:none
+}
+.iconbtn:hover{color:var(--osso);border-color:var(--fumo)}
+main{flex:1;padding:18px 16px calc(28px + var(--safe-b))}
+.view{display:none}
+.view.on{display:block}
+
+/* ---------- home ---------- */
+.hero{
+  border:1px solid var(--bordo);border-radius:var(--r);padding:18px;margin-bottom:22px;
+  background:linear-gradient(160deg,var(--pan) 0%,var(--nero) 100%)
+}
+.hero .range{
+  font-family:"IBM Plex Sans Condensed";font-size:40px;line-height:1;font-weight:600;letter-spacing:-.01em
+}
+.hero .range em{font-style:normal;color:var(--fumo);font-size:26px}
+.hero p{margin:10px 0 0;color:var(--fumo);font-size:13.5px;max-width:44ch}
+.hero .edit{margin-top:14px;font-size:13px;color:var(--ambra);border-bottom:1px solid rgba(232,163,61,.4);padding-bottom:1px}
+
+h2.sec{
+  font-family:"IBM Plex Sans Condensed";font-size:13px;font-weight:600;color:var(--fumo);
+  margin:0 0 10px;letter-spacing:.06em
+}
+.routines{display:flex;flex-direction:column;gap:10px;margin-bottom:26px}
+.routine{
+  display:flex;align-items:center;gap:14px;width:100%;text-align:left;
+  border:1px solid var(--bordo);border-radius:var(--r);padding:14px 15px;background:var(--pan);
+  transition:border-color .15s,background .15s
+}
+.routine:hover{border-color:var(--ambra);background:var(--pan2)}
+.routine .min{
+  font-family:"IBM Plex Sans Condensed";font-size:26px;font-weight:600;line-height:1;
+  color:var(--ambra);min-width:54px
+}
+.routine .min b{display:block;font-size:10px;font-weight:500;color:var(--fumo);letter-spacing:.08em;margin-top:3px}
+.routine .txt strong{display:block;font-weight:600;font-size:15.5px}
+.routine .txt small{color:var(--fumo);font-size:12.5px;line-height:1.4;display:block;margin-top:2px}
+
+/* ---------- libreria ---------- */
+.fase{margin-bottom:20px}
+.fase > h3{
+  font-family:"IBM Plex Sans Condensed";font-size:14px;font-weight:600;margin:0 0 4px;
+  display:flex;align-items:baseline;gap:8px
+}
+.fase > h3 i{font-style:normal;color:var(--ambra);font-size:12px;font-weight:500}
+.fase > p{margin:0 0 10px;font-size:12.5px;color:var(--fumo)}
+.exlist{display:flex;flex-direction:column;gap:1px;background:var(--bordo);border:1px solid var(--bordo);border-radius:var(--r);overflow:hidden}
+.exrow{display:flex;align-items:center;gap:12px;padding:11px 13px;background:var(--pan);width:100%;text-align:left}
+.exrow:hover{background:var(--pan2)}
+.exrow .syl{
+  font-family:"IBM Plex Sans Condensed";font-weight:600;font-size:15px;color:var(--ambra);
+  min-width:62px;letter-spacing:.01em
+}
+.exrow .nm{flex:1;font-size:14px}
+.exrow .nm small{display:block;color:var(--fumo);font-size:11.5px}
+.exrow .nm small.cueline{color:#C9A47A;margin-top:2px;line-height:1.35}
+.exrow .go{color:var(--fumo);font-size:18px}
+
+/* ---------- player ---------- */
+.pmeta{display:flex;align-items:baseline;gap:8px;font-size:12px;color:var(--fumo);margin-bottom:2px}
+.pmeta b{color:var(--ambra);font-weight:600}
+.pname{font-family:"IBM Plex Sans Condensed";font-size:22px;font-weight:600;margin:0 0 14px;line-height:1.15}
+
+.stage{
+  border:1px solid var(--bordo);border-radius:var(--r);background:var(--pan);
+  padding:20px 16px 16px;text-align:center;position:relative;overflow:hidden
+}
+.stage::before{
+  content:"";position:absolute;inset:0;opacity:.35;pointer-events:none;
+  background:radial-gradient(120% 80% at 50% 0%,rgba(232,163,61,.13),transparent 62%)
+}
+.state{
+  display:inline-flex;align-items:center;gap:7px;font-family:"IBM Plex Sans Condensed";
+  font-size:12px;font-weight:600;letter-spacing:.1em;padding:4px 12px;border-radius:99px;
+  border:1px solid var(--bordo);color:var(--fumo);position:relative
+}
+.state .dot{width:7px;height:7px;border-radius:99px;background:currentColor}
+.state.ascolta{color:var(--ambra);border-color:rgba(232,163,61,.45)}
+.state.canta{color:var(--salvia);border-color:rgba(134,180,154,.5)}
+
+.note{
+  font-family:"IBM Plex Sans Condensed";font-size:76px;font-weight:600;line-height:.95;
+  margin:12px 0 0;letter-spacing:-.02em;position:relative;font-variant-numeric:tabular-nums
+}
+.note.dim{color:var(--fumo);opacity:.45}
+.note sup{font-size:.42em;font-weight:500;vertical-align:super;color:var(--fumo);margin-left:2px}
+.sub{font-size:12.5px;color:var(--fumo);position:relative;margin-top:2px}
+.syllabig{
+  font-family:"IBM Plex Sans Condensed";font-size:30px;font-weight:600;color:var(--ambra);
+  margin-top:10px;letter-spacing:.03em;position:relative
+}
+
+/* piano */
+.piano{position:relative;height:52px;margin:18px 2px 4px;border-radius:5px;overflow:hidden;background:var(--nero)}
+.wk{position:absolute;top:0;bottom:0;background:#5A4A3E;border-right:1px solid var(--nero)}
+.wk.hit{background:var(--ambra)}
+.bk{position:absolute;top:0;height:62%;background:#1A1411;border-radius:0 0 2px 2px;z-index:2}
+.bk.hit{background:var(--ambra)}
+.plimit{position:absolute;top:0;bottom:0;width:2px;background:var(--ruggine);z-index:3;opacity:.9}
+
+.steps{display:flex;gap:5px;justify-content:center;margin-top:14px;position:relative;flex-wrap:wrap}
+.steps i{width:7px;height:7px;border-radius:99px;background:var(--bordo);display:block}
+.steps i.done{background:var(--fumo)}
+.steps i.now{background:var(--ambra);transform:scale(1.45)}
+
+.timer{font-family:"IBM Plex Sans Condensed";font-size:62px;font-weight:600;position:relative;font-variant-numeric:tabular-nums}
+
+.bar{height:3px;background:var(--bordo);border-radius:99px;margin:16px 0 0;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--ambra);width:0%;transition:width .2s linear}
+
+/* controls */
+.ctrls{display:flex;align-items:center;justify-content:center;gap:14px;margin:18px 0 6px}
+.cbtn{width:52px;height:52px;border-radius:99px;border:1px solid var(--bordo);display:grid;place-items:center;color:var(--fumo)}
+.cbtn:hover{color:var(--osso);border-color:var(--fumo)}
+.cbtn.play{width:70px;height:70px;background:var(--ambra);color:var(--nero);border-color:var(--ambra)}
+.cbtn.play:hover{color:var(--nero);background:#f0b257}
+
+.knobs{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.knob{border:1px solid var(--bordo);border-radius:var(--r);padding:10px 12px;background:var(--pan)}
+.knob label{font-size:11px;color:var(--fumo);letter-spacing:.05em;font-family:"IBM Plex Sans Condensed";font-weight:600}
+.knob .val{font-family:"IBM Plex Sans Condensed";font-size:18px;font-weight:600}
+.knob input[type=range]{width:100%;margin:4px 0 0;accent-color:var(--ambra)}
+
+.info{margin-top:20px;border-top:1px solid var(--bordo);padding-top:16px}
+.info h4{font-family:"IBM Plex Sans Condensed";font-size:12px;color:var(--fumo);margin:0 0 6px;letter-spacing:.06em}
+.info p{margin:0 0 12px;font-size:14px;line-height:1.6}
+.info .cue{border-left:2px solid var(--ambra);padding-left:13px;font-size:15px;line-height:1.6;margin:0 0 16px}
+.info .src{font-size:12.5px;color:var(--fumo);font-style:italic;line-height:1.5}
+.warn{border-left:2px solid var(--ruggine);padding-left:12px;font-size:13px;color:#E5B29A;margin-top:12px}
+
+.queue{margin-top:22px}
+.qrow{display:flex;gap:10px;align-items:center;padding:8px 0;font-size:13px;color:var(--fumo);border-top:1px solid var(--bordo)}
+.qrow.now{color:var(--osso)}
+.qrow .qi{font-family:"IBM Plex Sans Condensed";min-width:22px;font-size:12px}
+.qrow .qs{margin-left:auto;font-size:11.5px}
+
+/* impostazioni */
+.set{border:1px solid var(--bordo);border-radius:var(--r);padding:14px;margin-bottom:12px;background:var(--pan)}
+.set h4{margin:0 0 3px;font-size:14.5px;font-family:"IBM Plex Sans Condensed";font-weight:600}
+.set p{margin:0 0 10px;font-size:12.5px;color:var(--fumo)}
+.pick{display:flex;gap:6px;flex-wrap:wrap}
+.pick button{
+  border:1px solid var(--bordo);border-radius:7px;padding:6px 11px;font-size:13px;
+  font-family:"IBM Plex Sans Condensed";font-weight:500;color:var(--fumo)
+}
+.pick button.on{background:var(--ambra);color:var(--nero);border-color:var(--ambra);font-weight:600}
+.rowset{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 0;border-top:1px solid var(--bordo)}
+.rowset:first-of-type{border-top:none}
+.rowset span{font-size:14px}
+.rowset small{display:block;color:var(--fumo);font-size:12px}
+.stepper{display:flex;align-items:center;gap:2px;border:1px solid var(--bordo);border-radius:8px;flex:none}
+.stepper button{width:34px;height:32px;color:var(--fumo);font-size:17px}
+.stepper b{
+  font-family:"IBM Plex Sans Condensed";font-size:15px;min-width:52px;text-align:center;
+  border-left:1px solid var(--bordo);border-right:1px solid var(--bordo);height:32px;line-height:32px
+}
+.tog{width:46px;height:27px;border-radius:99px;background:var(--bordo);position:relative;flex:none;transition:background .15s}
+.tog i{position:absolute;top:3px;left:3px;width:21px;height:21px;border-radius:99px;background:var(--fumo);transition:left .15s,background .15s}
+.tog.on{background:rgba(232,163,61,.35)}
+.tog.on i{left:22px;background:var(--ambra)}
+.note-help{font-size:12.5px;color:var(--fumo);margin-top:16px;line-height:1.6}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="topbar">
+    <button class="iconbtn" id="back" hidden aria-label="Indietro">&#8249;</button>
+    <h1 class="cond">Studio Voce <span id="crumb">· baritono</span></h1>
+    <button class="iconbtn" id="toLib" aria-label="Libreria esercizi">&#9776;</button>
+    <button class="iconbtn" id="toSet" aria-label="Impostazioni">&#9881;</button>
+  </div>
+
+  <main>
+    <!-- HOME -->
+    <section class="view on" id="v-home">
+      <div class="hero">
+        <div class="range cond" id="heroRange"></div>
+        <p>Gli esercizi si fermano da soli quando arrivano al tuo limite: ogni vocalizzo sale di semitono finché la nota più acuta tocca il tetto del registro che stai allenando, poi ridiscende.</p>
+        <button class="edit" id="heroEdit">Regola la tua estensione</button>
+      </div>
+
+      <h2 class="sec cond">Sedute</h2>
+      <div class="routines" id="routines"></div>
+
+      <h2 class="sec cond">Esercizio singolo</h2>
+      <div class="routines">
+        <button class="routine" id="openLib">
+          <span class="min cond" id="nEx">—<b>ESERCIZI</b></span>
+          <span class="txt"><strong>Apri la libreria</strong><small>Scegli un singolo vocalizzo e lavoraci quanto vuoi</small></span>
+        </button>
+      </div>
+    </section>
+
+    <!-- LIBRERIA -->
+    <section class="view" id="v-lib"></section>
+
+    <!-- PLAYER -->
+    <section class="view" id="v-play">
+      <div class="pmeta"><b id="pFase"></b><span id="pPos"></span></div>
+      <h2 class="pname cond" id="pName"></h2>
+
+      <div class="stage">
+        <div class="state cond" id="pState"><i class="dot"></i><span>PRONTO</span></div>
+        <div id="pDisplay"></div>
+        <div class="piano" id="pPiano"></div>
+        <div class="steps" id="pSteps"></div>
+      </div>
+
+      <div class="bar"><i id="pBar"></i></div>
+
+      <div class="ctrls">
+        <button class="cbtn" id="cPrev" aria-label="Esercizio precedente">&#9198;</button>
+        <button class="cbtn play" id="cPlay" aria-label="Avvia">&#9654;</button>
+        <button class="cbtn" id="cNext" aria-label="Esercizio successivo">&#9197;</button>
+      </div>
+
+      <div class="knobs">
+        <div class="knob">
+          <label class="cond">TEMPO</label>
+          <div class="val cond"><span id="vBpm">90</span> bpm</div>
+          <input type="range" id="sBpm" min="50" max="160" step="2">
+        </div>
+        <div class="knob">
+          <label class="cond">VOLUME GUIDA</label>
+          <div class="val cond"><span id="vVol">70</span>%</div>
+          <input type="range" id="sVol" min="0" max="100" step="5">
+        </div>
+      </div>
+
+      <div class="info">
+        <h4 class="cond">IL SUONO</h4>
+        <p class="cue" id="pSuono"></p>
+        <h4 class="cond">COME SI FA</h4>
+        <p id="pIstr"></p>
+        <h4 class="cond">PERCHÉ</h4>
+        <p class="src" id="pFonte"></p>
+        <div class="warn" id="pWarn" hidden></div>
+      </div>
+
+      <div class="queue" id="pQueue"></div>
+    </section>
+
+    <!-- IMPOSTAZIONI -->
+    <section class="view" id="v-set"></section>
+  </main>
+</div>
+
+<script>
+"use strict";
+/* ============================================================
+   1. NOTE E UTILITÀ
+   ============================================================ */
+const IT = ["DO","DO♯","RE","RE♯","MI","FA","FA♯","SOL","SOL♯","LA","LA♯","SI"];
+const EN = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
+const BLACK = [1,3,6,8,10];
+const midiIt = m => IT[m%12] + Math.floor(m/12-1);
+const midiEn = m => EN[m%12] + Math.floor(m/12-1);
+const freq  = m => 440*Math.pow(2,(m-69)/12);
+const isBlack = m => BLACK.includes(m%12);
+
+/* ============================================================
+   2. LIBRERIA ESERCIZI
+   Sequenza costruita sull'impianto di riscaldamento usato nel canto
+   moderno: corpo+respiro → SOVT → stretch acuto → forza di petto →
+   mix/passaggio → tecnica → defaticamento.
+   pattern: [semitoni dalla fondamentale, battute]
+   registro: decide il tetto acuto (vedi impostazioni)
+   ============================================================ */
+const FASI = [
+  {n:1, t:"Corpo e respiro",      d:"Lo strumento è tutto il corpo. Prima si scioglie, poi si canta."},
+  {n:2, t:"SOVT — attivazione",   d:"Tubo semi-occluso: la contropressione fa vibrare le corde in modo efficiente e a basso impatto. È il modo più sicuro di accendere la voce."},
+  {n:3, t:"Stretch acuto",        d:"Allunga e assottiglia le corde (dominanza cricotiroidea) prima di chiedere potenza."},
+  {n:4, t:"Forza di petto",       d:"Costruisce lo spessore in basso. Per un baritono si ferma intorno a MI4–FA4: oltre, si spinge."},
+  {n:5, t:"Mix e passaggio",      d:"La zona che decide tutto per una voce grave: dal LA3 al RE4. Forza e flessibilità insieme."},
+  {n:6, t:"Tecnica moderna",      d:"Agilità, riff, dinamiche, effetti. Quello che serve davvero dentro un pezzo."},
+  {n:7, t:"Defaticamento",        d:"Riporta la voce in basso e la lascia pulita per il giorno dopo."}
+];
+
+const EX = [
+/* ---------- FASE 1 ---------- */
+{id:"corpo", fase:1, nome:"Sblocco del corpo", syl:"—", tipo:"timer", durata:60,
+ istr:"20 secondi di corsa sul posto o jumping jack. Poi cerchi di braccia, rotazioni di spalle, rotazioni lente della testa. Chiudi con un roll-down: scendi verso i piedi e risali una vertebra alla volta.",
+ fonte:"Andy King (New York Vocal Coaching) mette il corpo prima di qualsiasi suono: se hai le gambe rigide, la voce lo sente. Non servono venti minuti, serve essere caldo e sciolto."},
+
+{id:"postura", fase:1, nome:"Allineamento", syl:"—", tipo:"timer", durata:45,
+ istr:"In piedi, piedi paralleli larghezza bacino. Controlla: testa dritta, spalle allo stesso livello e non arrotolate in avanti, bacino neutro, ginocchia morbide e mai bloccate. Orecchie, spalle, anche e caviglie sulla stessa linea.",
+ fonte:"L'allineamento è dinamico, non rigido: cerchi mobilità, non la posizione da soldatino."},
+
+{id:"respiro", fase:1, nome:"Respiro costale e «sh»", syl:"SH", tipo:"timer", durata:90,
+ istr:"Mano sul fianco. Inspira senza esagerare: coste e addome si allargano da soli. Espira. Ripeti finché il respiro è liscio. Poi aggiungi resistenza: «sh-sh-sh-sh» pulsato per 4 volte, poi un «shhhhh» lungo e costante. Gola aperta, addome mai bloccato.",
+ fonte:"Prima si trova il respiro neutro, poi si aggiunge resistenza. La «sh» ti fa sentire il flusso senza ancora coinvolgere le corde."},
+
+{id:"lingua", fase:1, nome:"Lingua, mascella, collo", syl:"—", tipo:"timer", durata:60,
+ istr:"Lingua fuori il più possibile, 5 secondi, rilascia (3 volte). Massaggia i muscoli sotto gli zigomi con la mascella morbida. Fai cadere la mascella senza spingerla. Rotazioni lente del collo in entrambe le direzioni.",
+ fonte:"Lingua e mascella sono i due punti dove i cantanti moderni accumulano più tensione: se restano rigidi, il passaggio si chiude."},
+
+{id:"dizione", fase:1, nome:"Scioglilingua", syl:"—", tipo:"timer", durata:45,
+ istr:"«Trentatré trentini entrarono a Trento tutti e trentatré trotterellando.» Poi: «Sopra la panca la capra campa.» Parti lentissimo e pulitissimo: acceleri solo finché resta preciso.",
+ fonte:"Il beneficio sta nella precisione, non nella velocità. Serve a portare l'articolazione davanti, sulle labbra e sui denti."},
+
+/* ---------- FASE 2 — SOVT ---------- */
+{id:"lip5", fase:2, nome:"Lip trill discendente 5-4-3-2-1", syl:"BRRR", tipo:"scale",
+ pattern:[[7,1],[5,1],[4,1],[2,1],[0,2]], bpm:96, registro:"sovt", passo:1, andataRitorno:true, risposta:true,
+ istr:"Labbra rilassate, soffia e falle vibrare. Se non partono, appoggia due dita agli angoli della bocca e spingi leggermente in dentro. Flusso d'aria costante: la vibrazione non deve mai interrompersi a metà scala.",
+ fonte:"È l'esercizio d'apertura più usato nel canto moderno. Il lip trill è un tubo semi-occluso: la pressione che torna indietro sulle corde le fa oscillare con meno sforzo e più ampiezza, quindi puoi salire senza rischiare niente."},
+
+{id:"straw", fase:2, nome:"Cannuccia — sirena di ottava", syl:"OO (nella cannuccia)", tipo:"glide",
+ glide:{from:0,to:12,beats:3,back:true}, bpm:72, registro:"sovt", passo:3, andataRitorno:false,
+ istr:"Prendi una cannuccia da bibita e cantaci dentro a labbra chiuse attorno. Sali e scendi di un'ottava in modo continuo, senza gradini e senza scatti. Sentirai un solletico sulle labbra: è il segno che sta funzionando.",
+ fonte:"La straw phonation è l'esercizio SOVT più studiato in laboratorio (ricerca di Ingo Titze): abbassa lo sforzo di collisione delle corde e rende l'emissione più economica. Ottimo anche quando la voce è stanca o un po' gonfia."},
+
+{id:"ng", fase:2, nome:"Sirena su «NG»", syl:"NG", tipo:"glide",
+ glide:{from:0,to:12,beats:3,back:true}, bpm:76, registro:"testa", passo:3, andataRitorno:false,
+ istr:"Suono di «ma-NGia», lingua incollata al palato molle, bocca socchiusa. Sali e scendi come una sirena, senza buchi. Solleva gli zigomi e tieni il suono avanti nel naso: deve solleticare.",
+ fonte:"La NG unisce i registri senza farti scegliere fra petto e testa: passi il ponte in glissando e il cervello impara che non c'è nessun gradino da saltare."},
+
+{id:"vz", fase:2, nome:"«V–Z» sostenute 1-3-5-3-1", syl:"VVV / ZZZ", tipo:"scale",
+ pattern:[[0,1],[4,1],[7,2],[4,1],[0,2]], bpm:84, registro:"sovt", passo:2, andataRitorno:true, risposta:true,
+ istr:"Denti superiori sul labbro inferiore per la V, poi ripeti la stessa scala su una Z ronzante. Suono compatto e continuo, pressione bassa: non gonfiare le guance.",
+ fonte:"Consonanti sonore continue: creano resistenza come la cannuccia ma ti costringono anche a mantenere la chiusura delle corde. Ponte perfetto tra SOVT e vocali aperte."},
+
+{id:"rr", fase:2, nome:"Trillo di lingua 1-5-8-5-1", syl:"RRR", tipo:"scale",
+ pattern:[[0,1],[7,1],[12,2],[7,1],[0,2]], bpm:88, registro:"sovt", passo:2, andataRitorno:true, risposta:true,
+ istr:"La «r» arrotata italiana, tenuta per tutto l'arpeggio. Se il trillo si blocca sull'acuto, è il flusso che è calato: dai più aria, non più forza.",
+ fonte:"Alternativa al lip trill per chi ha labbra tese. Lavora già sull'intervallo di ottava, cioè sul salto che nelle canzoni ti mette in crisi."},
+
+/* ---------- FASE 3 — STRETCH ACUTO ---------- */
+{id:"oo54", fase:3, nome:"Voce di testa 5-4-3-2-1", syl:"OO", tipo:"scale",
+ pattern:[[7,1],[5,1],[4,1],[2,1],[0,2]], bpm:88, registro:"testa", passo:1, andataRitorno:true, risposta:true,
+ istr:"Vocale chiusa «u» come in «luna», labbra leggermente sporte, volume medio-basso. Non cercare potenza: cerchi leggerezza e allungamento. Se senti spingere, abbassa il volume della tua voce, non del metronomo.",
+ fonte:"Dopo l'attivazione, il secondo passo standard è lo stretch in testa. La vocale chiusa invita risonanza nasale e quindi flessibilità: le corde si allungano e si assottigliano prima che tu chieda spessore."},
+
+{id:"ee181", fase:3, nome:"Arpeggio di testa 1-5-8-5-1", syl:"EE", tipo:"scale",
+ pattern:[[0,1],[7,1],[12,2],[7,1],[0,2]], bpm:84, registro:"testa", passo:2, andataRitorno:true, risposta:true,
+ istr:"«i» come in «vino», stretta e squillante. Sull'ottava alta non aprire la bocca di più: tieni la vocale stretta e lascia che il suono vada dietro agli occhi.",
+ fonte:"L'ottava ti porta sopra il passaggio in un colpo solo. Con una vocale chiusa la laringe resta stabile e non ti trascina dietro la voce di petto."},
+
+{id:"wee8", fase:3, nome:"Ottava lenta sostenuta", syl:"WEE", tipo:"scale",
+ pattern:[[0,2],[12,4],[0,2]], bpm:72, registro:"testa", passo:2, andataRitorno:true, risposta:true,
+ istr:"Sali l'ottava senza glissato, come due note pulite. Tieni l'acuto per quattro battute con suono costante, poi torna giù. La «w» iniziale ti aiuta a non attaccare duro.",
+ fonte:"Sostenere in testa è diverso dal toccarla di passaggio: qui costruisci resistenza nel registro acuto, che è quello che cede per primo dal vivo."},
+
+{id:"falsetto", fase:3, nome:"Sirena in falsetto", syl:"UH–OO", tipo:"glide",
+ glide:{from:0,to:19,beats:4,back:true}, bpm:64, registro:"testa", passo:4, andataRitorno:false,
+ istr:"Parti dal tuo grave comodo e sali fino al falsetto leggero, poi scendi. Lascia che la voce «cambi colore» strada facendo: qui il flip non è un errore, è materiale di lavoro.",
+ fonte:"Percorrere tutta l'estensione in un gesto unico è il modo più rapido per mappare dove sono i tuoi passaggi. Da baritono ne senti due: uno intorno al LA3–SI♭3 e uno intorno al RE4–MI♭4."},
+
+/* ---------- FASE 4 — FORZA DI PETTO ---------- */
+{id:"bah131", fase:4, nome:"«Bah» 1-3-5-3-1", syl:"BAH", tipo:"scale",
+ pattern:[[0,1],[4,1],[7,2],[4,1],[0,2]], bpm:88, registro:"petto", passo:1, andataRitorno:true, risposta:true,
+ istr:"Vocale «a» larga e bocca vera, non finta. La B iniziale dà un attacco netto: le corde si chiudono bene. Suono pieno, corpo appoggiato a terra.",
+ fonte:"Terza fase del riscaldamento: la forza. Vocali aperte come «a» e «o» chiamano più bocca e più spessore, quindi costruiscono il petto. Serve volume, ma dentro il limite.",
+ warn:"Da baritono, non portare il petto pieno oltre MI4–FA4. L'esercizio si ferma lì da solo: se vuoi salire, sali con il mix della fase 5, non spingendo questo."},
+
+{id:"goh54", fase:4, nome:"«Goh» 5-4-3-2-1", syl:"GOH", tipo:"scale",
+ pattern:[[7,1],[5,1],[4,1],[2,1],[0,2]], bpm:92, registro:"petto", passo:1, andataRitorno:true, risposta:true,
+ istr:"«o» come in «sole», suono rotondo e grosso. Scendendo non lasciare cadere l'appoggio: l'ultima nota deve avere la stessa energia della prima.",
+ fonte:"La discendente è la più onesta: ti fa sentire subito se stai reggendo il suono con l'aria o se stai schiacciando con la gola."},
+
+{id:"mum9", fase:4, nome:"Scala 1-2-3-4-5-4-3-2-1", syl:"MUM", tipo:"scale",
+ pattern:[[0,1],[2,1],[4,1],[5,1],[7,1],[5,1],[4,1],[2,1],[0,2]], bpm:104, registro:"petto", passo:1, andataRitorno:true, risposta:true,
+ istr:"La M chiude e riporta il suono avanti a ogni nota. Legato assoluto: nessun buco d'aria tra una nota e l'altra, come se fosse una linea sola.",
+ fonte:"È l'esercizio neutro per eccellenza: schema semplice, sillaba risonante, nessuna richiesta estrema. Serve a controllare com'è la voce oggi."},
+
+{id:"messa", fase:4, nome:"Messa di voce", syl:"AH", tipo:"sustain",
+ sustain:{beats:8,dyn:"messa"}, bpm:60, registro:"petto", passo:2, andataRitorno:true, risposta:true,
+ istr:"Attacca piano, cresci fino al massimo che regge senza irrigidirsi, poi torna piano. Altezza e colore non devono cambiare: cambia solo l'intensità.",
+ fonte:"Crescendo e diminuendo sulla stessa nota: alleni la dinamica e, nel farlo, attraversi mix diversi sulla stessa altezza. È lavoro classico che serve moltissimo anche nel pop."},
+
+/* ---------- FASE 5 — MIX ---------- */
+{id:"nay131", fase:5, nome:"«Nay» 1-3-5-3-1", syl:"NAY", tipo:"scale",
+ pattern:[[0,1],[4,1],[7,2],[4,1],[0,2]], bpm:96, registro:"misto", passo:1, andataRitorno:true, risposta:true,
+ istr:"Voce da strega o da papera, nasale e un po' antipatica. Sì, deve suonare brutta. Zigomi alti, suono stretto e squillante. Non aprire la vocale quando sali.",
+ fonte:"Il «nay» col twang è lo strumento classico per attraversare il passaggio senza crack: la stretta epilaringea alza la brillantezza senza chiedere pressione. Nella didattica Estill è il modo di ottenere volume percepito a costo basso."},
+
+{id:"bib181", fase:5, nome:"«Bib» 1-5-8-5-1", syl:"BIB", tipo:"scale",
+ pattern:[[0,1],[7,1],[12,2],[7,1],[0,2]], bpm:92, registro:"misto", passo:1, andataRitorno:true, risposta:true,
+ istr:"La B ti dà la chiusura e la forza, la «i» ti dà la flessibilità. Tienile insieme: né gridato né soffiato. Sull'ottava resta stretto.",
+ fonte:"Sillaba costruita apposta per il mix: consonante forte + vocale chiusa. La consonante compatta le corde, la vocale chiara porta risonanza nasale e quindi allungamento. Metà petto e metà testa nella stessa nota."},
+
+{id:"goog", fase:5, nome:"«Goog» arpeggio di ottava", syl:"GOOG", tipo:"scale",
+ pattern:[[0,1],[4,1],[7,1],[12,2],[7,1],[4,1],[0,2]], bpm:100, registro:"misto", passo:1, andataRitorno:true, risposta:true,
+ istr:"Vocale «u» stretta, mascella ferma e bassa, nessuna smorfia in salita. Se senti tirare sul RE4–MI4, alleggerisci invece di aprire.",
+ fonte:"Uno degli esercizi più noti del metodo Speech Level Singing: la «oo» tiene la laringe stabile mentre l'arpeggio ti porta sopra il ponte, così la voce resta a livello di parlato anche in alto."},
+
+{id:"mum851", fase:5, nome:"Mix di testa 8-5-3-1", syl:"NOON", tipo:"scale",
+ pattern:[[12,1],[7,1],[4,1],[0,3]], bpm:88, registro:"misto", passo:1, andataRitorno:true, risposta:true,
+ istr:"Parti già in alto, con suono leggero ma non soffiato, e scendi mantenendo lo stesso colore fino in basso. L'obiettivo è arrivare al grave senza che «scatti» in petto.",
+ fonte:"Dopo il mix bilanciato si lavora il mix a dominanza di testa. Partire dall'alto impedisce alla voce di agganciare troppo peso e ti fa scendere senza gradino."},
+
+{id:"scala9", fase:5, nome:"Scala di ottava completa", syl:"AH–EE", tipo:"scale",
+ pattern:[[0,1],[2,1],[4,1],[5,1],[7,1],[9,1],[11,1],[12,2],[11,1],[9,1],[7,1],[5,1],[4,1],[2,1],[0,2]], bpm:120, registro:"misto", passo:1, andataRitorno:true, risposta:true,
+ istr:"Sali su «ah» e scendi su «ee», legato, senza rallentare a metà. Tutte le note devono avere la stessa intensità: nessuna nota più forte solo perché è più acuta.",
+ fonte:"L'ottava intera è il test più duro del passaggio, perché lo attraversi due volte senza scorciatoie. Se una nota salta, è quella la tua nota da lavorare."},
+
+/* ---------- FASE 6 — TECNICA ---------- */
+{id:"agilita", fase:6, nome:"Agilità — scala veloce", syl:"AH", tipo:"scale",
+ pattern:[[0,.5],[2,.5],[4,.5],[5,.5],[7,.5],[5,.5],[4,.5],[2,.5],[0,1]], bpm:132, registro:"misto", passo:1, andataRitorno:true, risposta:true,
+ istr:"Ogni nota distinta, nessun glissato tra una e l'altra. Mascella immobile: si muove solo la laringe. Se si impasta, abbassa il tempo con lo slider finché torna pulito.",
+ fonte:"L'agilità non si guadagna a forza di velocità ma di precisione: il tempo si alza solo quando ogni nota è ancora riconoscibile."},
+
+{id:"staccato", fase:6, nome:"Arpeggio staccato", syl:"HA", tipo:"scale", staccato:true,
+ pattern:[[0,1],[4,1],[7,1],[12,1],[7,1],[4,1],[0,2]], bpm:100, registro:"misto", passo:1, andataRitorno:true, risposta:true,
+ istr:"Note corte e staccate, ma l'attacco parte dalle corde, non da un colpo di pancia. Cerca un onset netto e pulito, senza soffio prima della nota e senza colpo di glottide.",
+ fonte:"Lo staccato allena l'onset, cioè il modo in cui la nota comincia. Nel pop è la differenza tra un attacco che buca il mix e uno che arriva sempre un attimo dopo."},
+
+{id:"riff", fase:6, nome:"Riff pentatonico", syl:"WHOA", tipo:"scale",
+ pattern:[[12,.5],[10,.5],[7,.5],[5,.5],[3,.5],[0,2]], bpm:104, registro:"misto", passo:1, andataRitorno:true, risposta:true,
+ istr:"Pentatonica minore in discesa. Prima lentissima e con ogni nota a fuoco, poi accelera. Quando la sai, cambia l'ordine delle note e inventane di tue.",
+ fonte:"Il melisma si costruisce sulla pentatonica. Vale la pena allenarlo anche se il tuo genere non lo richiede: è il modo più veloce per guadagnare flessibilità."},
+
+{id:"sustain", fase:6, nome:"Nota lunga con vibrato", syl:"AH", tipo:"sustain",
+ sustain:{beats:10,dyn:"flat"}, bpm:60, registro:"misto", passo:3, andataRitorno:true, risposta:true,
+ istr:"Tieni la nota a lungo: prima metà dritta e ferma, seconda metà lasciando entrare il vibrato naturale. Non produrlo con la mascella o con la pancia: rilassa e lascialo arrivare.",
+ fonte:"Negli esercizi si fanno quasi sempre scale, poi in una canzone c'è una nota da tenere dieci secondi e non sai come. Va allenata a parte."},
+
+{id:"fry", fase:6, nome:"Vocal fry → mix", syl:"UH → AH", tipo:"sustain",
+ sustain:{beats:8,dyn:"flat"}, bpm:60, registro:"petto", passo:3, andataRitorno:false,
+ istr:"Parti da un crepitio da porta che cigola, il più leggero possibile, poi apri sulla nota mantenendo la stessa sensazione di aria minima. Il passaggio fry-suono deve essere senza scatti.",
+ fonte:"Il fry ti mette le corde in chiusura completa con pressione bassissima. Usarlo come rampa di lancio dà un attacco compatto senza durezza, ed è un colore molto usato nel pop."},
+
+{id:"soffio", fase:6, nome:"Suono soffiato 5-3-1", syl:"HAH", tipo:"scale",
+ pattern:[[7,2],[4,2],[0,3]], bpm:76, registro:"misto", passo:2, andataRitorno:true, risposta:true,
+ istr:"Aggiungi aria di proposito, come una voce intima al microfono. Poi ripeti la stessa scala pulita. Devi poter passare dall'uno all'altro a comando.",
+ fonte:"Nel pop il soffiato è una scelta espressiva, non un difetto — ma va controllato. Saperlo accendere e spegnere a piacere è quello che distingue il colore dalla perdita d'aria."},
+
+{id:"flip", fase:6, nome:"Flip volontario", syl:"WOO-OH", tipo:"scale",
+ pattern:[[0,1],[12,2],[0,2]], bpm:84, registro:"testa", passo:2, andataRitorno:true, risposta:true,
+ istr:"Fai crepare la voce di proposito nel salto d'ottava, poi ricadi. Sembra ridicolo: è esattamente il punto. Impari a controllare il cambio di registro invece di subirlo.",
+ fonte:"Lo yodel controllato compare continuamente nel pop e nel rock. Allenato di proposito, smette di capitarti addosso nei momenti sbagliati."},
+
+{id:"twang", fase:6, nome:"Twang controllato", syl:"NYA", tipo:"scale",
+ pattern:[[0,1],[7,2],[0,2]], bpm:88, registro:"misto", passo:2, andataRitorno:true, risposta:true,
+ istr:"Suono stretto e penetrante, con gli zigomi alti. Deve sentirsi tagliente ma senza bruciore e senza raschio. Se gratta, fermati: hai stretto la gola invece dell'epilaringe.",
+ fonte:"Il twang aumenta il volume percepito senza aumentare la pressione sulle corde: è il motore del suono rock e pop moderno, e la base dell'uso sano dei colori distorti.",
+ warn:"Alla minima sensazione di raschio o di prurito, chiudi qui e passa al defaticamento."},
+
+/* ---------- FASE 7 ---------- */
+{id:"cooldown1", fase:7, nome:"Lip trill discendente", syl:"BRRR", tipo:"scale",
+ pattern:[[7,1],[5,1],[4,1],[2,1],[0,2]], bpm:80, registro:"sovt", passo:2, andataRitorno:false, discendente:true,
+ istr:"Solo in discesa, volume basso, nessuno sforzo. Lascia che la voce si posi verso il grave.",
+ fonte:"Il defaticamento riporta le corde a un assetto rilassato dopo il lavoro in acuto. Salti questo passaggio e domani la voce parte indietro."},
+
+{id:"cooldown2", fase:7, nome:"Sirena discendente", syl:"MMM", tipo:"glide",
+ glide:{from:12,to:0,beats:4,back:false}, bpm:66, registro:"sovt", passo:3, andataRitorno:false, discendente:true,
+ istr:"Mugolio a bocca chiusa, morbidissimo. Scendi lentamente senza mai forzare la nota più bassa.",
+ fonte:"Il mugolio è un SOVT leggero: chiude la sessione senza chiedere altro lavoro alle corde."},
+
+{id:"cooldown3", fase:7, nome:"Respiro finale", syl:"—", tipo:"timer", durata:60,
+ istr:"Sei respiri lenti con espirazione più lunga dell'inspirazione. Poi sciogli spalle e mascella. Bevi acqua a temperatura ambiente. Per la prossima mezz'ora, parla poco e non sussurrare.",
+ fonte:"Il sussurro affatica le corde più del parlato normale: è il classico errore che si fa proprio quando si vuole riposare la voce."}
+];
+
+
+/* Taratura dei trasporti: ogni esercizio arriva al tetto del suo registro
+   e copre nStep gradini sotto, invece di spazzolare tutta l'estensione.
+   [passo in semitoni, gradini, andata e ritorno, (semitoni sotto il tetto)] */
+const TUNE = {
+  lip5:[2,10,true],     straw:[3,5,false],   ng:[3,6,false],     vz:[2,9,true],      rr:[2,7,true],
+  oo54:[1,12,true],      ee181:[1,7,true],    wee8:[2,5,true],    falsetto:[4,4,false],
+  bah131:[1,8,true],    goh54:[1,8,true],    mum9:[1,6,true],    messa:[3,4,true],
+  nay131:[1,9,true],    bib181:[1,8,true],   goog:[1,6,true],    mum851:[1,7,true],  scala9:[1,4,true],
+  agilita:[1,9,true],   staccato:[1,6,true], riff:[1,8,true],    sustain:[5,3,true],
+  fry:[4,4,false],      soffio:[2,5,true],   flip:[2,5,true],    twang:[2,4,true],
+  cooldown1:[2,7,false,5], cooldown2:[3,4,false,5]
+};
+EX.forEach(e=>{ const t=TUNE[e.id]; if(!t) return; e.passo=t[0]; e.nStep=t[1]; e.andataRitorno=t[2]; if(t[3]!=null) e.tettoRel=t[3]; });
+
+
+/* Il suono in parole povere: a cosa assomiglia nella vita di tutti i giorni.
+   Serve a ritrovare la tecnica giusta in due secondi, senza rileggere tutto. */
+const SUONO = {
+corpo:"Muoviti come prima di una partita, non come in palestra: deve sciogliere, non stancare. Nel roll-down la testa è l’ultima cosa a risalire, pesante come un sasso.",
+postura:"Un filo invisibile ti tira su dalla nuca e lascia cadere le spalle. Ginocchia morbide come quando stai in piedi su un autobus in movimento: pronto a ondeggiare, mai bloccato.",
+respiro:"La pancia esce da sola sull’inspirazione, non la spingi tu. Per la «sh» usa il suono con cui zittiresti qualcuno al cinema: costante, lungo, senza mai stringere la gola.",
+lingua:"Lingua fuori come quando fai una linguaccia allo specchio. Per la mascella, fai finta di masticare una gomma enorme a bocca aperta e molle.",
+dizione:"Parla come un doppiatore che deve farsi capire in una stanza rumorosa: le consonanti stanno sulla punta della lingua e sulle labbra, mai in gola.",
+
+lip5:"È il «brrr» di quando rientri in casa dal freddo, o il rumore del motorino che facevi da bambino. Labbra molli e pesanti, aria continua: se si fermano non è colpa delle labbra, è l’aria che è calata.",
+straw:"Come bere l’ultimo sorso di un frappè con la cannuccia, ma invece di risucchiare ci canti dentro. Labbra chiuse attorno alla cannuccia, guance ferme, niente gonfiore.",
+ng:"Il suono di quando qualcuno ti spiega una cosa e tu annuisci: «nnnng». Come in maNGiare. La lingua resta incollata in alto e dietro, e il suono esce dal naso anche a bocca socchiusa.",
+vz:"La V è il ronzio di un’ape vicino all’orecchio, la Z è la zanzara. Suono continuo e compatto, senza aria che scappa ai lati dei denti.",
+rr:"La erre arrotata di quando imiti un motore: «brrrum». La punta della lingua è leggera e sbatte da sola contro il palato, non la spingi.",
+
+oo54:"È il «uuuh» del gufo, o quello che ti esce vedendo un cucciolo. Labbra a beccuccio, suono piccolo e morbido, come se cantassi per non svegliare nessuno in casa.",
+ee181:"Il «iiih» di quando una cosa ti fa un po’ schifo, o la vocetta del topolino nei cartoni. Stretto e sottile, punta dietro agli occhi.",
+wee8:"Il «weee» del bambino che scende dallo scivolo. Ma le due note vanno toccate pulite, non scivolate: pensa a due gradini, non a una rampa.",
+falsetto:"La sirena dell-ambulanza lontana, oppure il verso che fai quando senti un prezzo assurdo: «uuuuuh». Lascia che la voce si assottigli mentre sale: non servono muscoli, serve solo che non si interrompa.",
+
+bah131:"La voce con cui chiami qualcuno dall’altra parte della strada: piena e aperta, ma non urlata. La B è una porta che si apre di colpo, non un pugno.",
+goh54:"Il «ooooh» di quando vedi qualcosa di bello dal vivo. Rotondo, grosso, bocca davvero aperta e non finta.",
+mum9:"Il «mmmm» di quando assaggi qualcosa di buono, poi apri sulla A e richiudi. A ogni nota devi sentire un solletico sulle labbra: se sparisce, il suono è scivolato indietro.",
+messa:"Come un’auto che si avvicina e poi si allontana: la nota resta la stessa, cambia solo quanto è vicina. La vocale non deve cambiare forma mentre cresci.",
+
+nay131:"La voce della strega di Biancaneve, o quella di Paperino quando protesta. Nasale, stretta, un po’ fastidiosa: se ti sembra brutta, è esattamente giusta.",
+bib181:"Dillo come se chiamassi un bambino piccolo: «bib-bib». La B ti chiude le corde, la I tiene il suono sottile. Insieme fanno la voce di chi parla forte senza gridare.",
+goog:"Come quando dici «guuu» a un neonato. La bocca resta quasi immobile per tutto l’arpeggio: se ti si apre salendo, stai perdendo il mix.",
+mum851:"Il «nuuun» di quando ti lamenti dicendo «nooo», ma stretto e nasale. Parti già leggero in alto e scendi senza che la voce scatti in petto a metà strada.",
+scala9:"Immagina una scala vera, un gradino per nota: nessun gradino più alto degli altri solo perché è più in su. Sali su A, scendi su I, senza fermarti in cima.",
+
+agilita:"Come quando ridi a scatti: «ah-ah-ah-ah». Ogni nota è un piccolo impulso che parte da dentro, mai un movimento di mascella.",
+staccato:"Il verso di una risata trattenuta: «ha! ha!». Deve partire netto: niente soffio prima della nota, niente colpo di gola dietro.",
+riff:"Il «whoa» con cui commenti una giocata in tv, ma fatto scendendo nota per nota. All-inizio lentissimo, come se le contassi a una a una.",
+sustain:"Come tenere l’ultima nota di una canzone allo stadio: prima metà dritta come un filo teso, poi lasci arrivare il vibrato da solo, come un’onda. Non lo fabbrichi con la pancia.",
+fry:"Il crepitio della voce appena sveglio al mattino, o una porta che cigola lentissima. Da lì apri sulla nota senza cambiare la sensazione di aria minima.",
+soffio:"La voce con cui racconti un segreto vicino all’orecchio, ma cantata. Poi rifai la stessa frase pulita: devi poter passare dall’una all’altra a comando.",
+flip:"Lo yodel tirolese, o il verso con cui imiti un gallo. Fai crepare la voce di proposito nel salto: qui la crepa è l’esercizio, non l’errore.",
+twang:"Il verso del gatto che protesta: «nnnya». Stretto e tagliente come una tromba con la sordina. Non deve mai grattare: se gratta, hai stretto la gola invece dell’epilaringe.",
+
+cooldown1:"Lo stesso «brrr» di prima, ma con l’energia di chi sta per addormentarsi. Volume da stanza accanto.",
+cooldown2:"Il «mmmm» di quando ascolti qualcuno annuendo. Labbra chiuse ma denti leggermente staccati dentro, bocca morbida e vuota. Lascia che il suono si posi verso il basso.",
+cooldown3:"Respira come quando ti stendi a letto dopo una giornata lunga: espirazione più lunga dell’inspirazione, senza contare niente."
+};
+EX.forEach(e=>{ if(SUONO[e.id]) e.suono=SUONO[e.id]; });
+
+const EXBYID = Object.fromEntries(EX.map(e=>[e.id,e]));
+
+/* ---------- ROUTINE ---------- */
+const ROUTINES = [
+ {id:"rapido", nome:"Riscaldamento rapido", desc:"Il minimo indispensabile prima di cantare: corpo, SOVT, testa, petto, un mix.",
+  lista:["respiro","lip5","ng","oo54","bah131","nay131","cooldown1"]},
+ {id:"completo", nome:"Seduta completa", desc:"Il percorso intero dai coach di canto moderno: corpo → SOVT → acuto → petto → mix → defaticamento.",
+  lista:["corpo","respiro","lingua","lip5","straw","ng","oo54","ee181","bah131","goh54","mum9","nay131","bib181","goog","cooldown1","cooldown3"]},
+ {id:"tecnica", nome:"Tecnica avanzata", desc:"Riscaldamento breve e poi tutto sul mix, l'agilità, i riff e gli effetti moderni.",
+  lista:["respiro","lip5","oo54","nay131","bib181","goog","scala9","agilita","staccato","riff","sustain","fry","soffio","flip","twang","cooldown1","cooldown3"]},
+ {id:"passaggio", nome:"Solo il passaggio", desc:"Mirata sulla zona LA3–MI4, dove un baritono si gioca tutto il repertorio pop.",
+  lista:["lip5","ng","oo54","nay131","bib181","goog","mum851","scala9","cooldown1"]},
+ {id:"stanca", nome:"Voce stanca o al mattino", desc:"Solo esercizi a tubo semi-occluso e volumi bassi. Nessuna richiesta di potenza.",
+  lista:["respiro","straw","lip5","ng","vz","mum851","cooldown2","cooldown3"]},
+ {id:"cool", nome:"Defaticamento", desc:"Dopo prove o concerto: cinque minuti per rimettere a posto la voce.",
+  lista:["cooldown1","cooldown2","cooldown3"]}
+];
+
+/* ============================================================
+   3. IMPOSTAZIONI
+   ============================================================ */
+const DEF = {
+  floor:43,                                  // SOL2
+  ceil:{petto:65, misto:69, testa:74, sovt:72},  // FA4 / LA4 / RE5 / DO5
+  timbro:"piano",
+  risposta:true,     // ascolti la guida, poi canti tu in silenzio
+  drone:false,
+  click:false,
+  bpmAdj:0,
+  vol:70
+};
+let S = Object.assign({},DEF,{ceil:Object.assign({},DEF.ceil)});
+
+const store = {
+  async get(k){ try{ if(window.storage){const r=await window.storage.get(k); return r?r.value:null;} return localStorage.getItem(k);}catch(e){return null} },
+  async set(k,v){ try{ if(window.storage){await window.storage.set(k,v); return;} localStorage.setItem(k,v);}catch(e){} }
+};
+async function loadS(){ const raw = await store.get("studiovoce:set"); if(raw){ try{ const o=JSON.parse(raw); S=Object.assign({},DEF,o,{ceil:Object.assign({},DEF.ceil,o.ceil||{})}); }catch(e){} } }
+function saveS(){ store.set("studiovoce:set", JSON.stringify(S)); }
+
+/* ============================================================
+   4. MOTORE AUDIO
+   ============================================================ */
+let ctx=null, master=null, droneNode=null, vivi=[];
+function audio(){
+  if(ctx) return ctx;
+  ctx = new (window.AudioContext||window.webkitAudioContext)();
+  master = ctx.createGain();
+  master.gain.value = S.vol/100*0.5;
+  const comp = ctx.createDynamicsCompressor();
+  comp.threshold.value=-16; comp.ratio.value=4;
+  master.connect(comp); comp.connect(ctx.destination);
+  return ctx;
+}
+function setVol(){ if(master) master.gain.setTargetAtTime(S.vol/100*0.5, ctx.currentTime, .02); }
+
+// timbro "piano": triangolo + armoniche, decadimento
+// timbro "voce":  dente di sega filtrato su tre formanti (vocale /a/)
+function voice(t0, dur, freqFn, dyn){
+  const c = audio();
+  const g = c.createGain(); g.connect(master);
+  const a=0.02, r=Math.min(.25,dur*.4);
+  if(dyn==="messa"){
+    g.gain.setValueAtTime(0.0001,t0);
+    g.gain.exponentialRampToValueAtTime(.12,t0+a);
+    g.gain.exponentialRampToValueAtTime(.85,t0+dur*.5);
+    g.gain.exponentialRampToValueAtTime(.10,t0+dur*.95);
+    g.gain.exponentialRampToValueAtTime(.0001,t0+dur);
+  } else {
+    g.gain.setValueAtTime(0.0001,t0);
+    g.gain.exponentialRampToValueAtTime(.9,t0+a);
+    g.gain.setValueAtTime(.9,t0+Math.max(a,dur-r));
+    g.gain.exponentialRampToValueAtTime(.0001,t0+dur);
+  }
+  const nodes=[];
+  if(S.timbro==="voce"){
+    const o=c.createOscillator(); o.type="sawtooth"; freqFn(o.frequency);
+    const pre=c.createGain(); pre.gain.value=.16; o.connect(pre);
+    [[700,80,1],[1180,90,.55],[2600,120,.28]].forEach(([f,q,amp])=>{
+      const bp=c.createBiquadFilter(); bp.type="bandpass"; bp.frequency.value=f; bp.Q.value=f/q;
+      const bg=c.createGain(); bg.gain.value=amp;
+      pre.connect(bp); bp.connect(bg); bg.connect(g);
+    });
+    const lp=c.createBiquadFilter(); lp.type="lowpass"; lp.frequency.value=3800;
+    pre.connect(lp); const dg=c.createGain(); dg.gain.value=.18; lp.connect(dg); dg.connect(g);
+    // leggero vibrato dopo mezzo secondo
+    if(dur>1.2){
+      const lfo=c.createOscillator(); lfo.frequency.value=5.2;
+      const la=c.createGain(); la.gain.setValueAtTime(0,t0); la.gain.linearRampToValueAtTime(4.5,t0+.8);
+      lfo.connect(la); la.connect(o.detune); lfo.start(t0); lfo.stop(t0+dur+.05); nodes.push(lfo);
+    }
+    o.start(t0); o.stop(t0+dur+.05); nodes.push(o);
+  } else {
+    const lp=c.createBiquadFilter(); lp.type="lowpass"; lp.frequency.value=4200; lp.Q.value=.6; lp.connect(g);
+    [[1,"triangle",.55,0],[2,"sine",.20,0],[3,"sine",.09,0],[1,"triangle",.18,7]].forEach(([mult,type,amp,det])=>{
+      const o=c.createOscillator(); o.type=type; o.detune.value=det;
+      freqFn(o.frequency, mult);
+      const og=c.createGain(); og.gain.value=amp;
+      o.connect(og); og.connect(lp); o.start(t0); o.stop(t0+dur+.05); nodes.push(o);
+    });
+  }
+  vivi.push({g,end:t0+dur+.1});
+  if(vivi.length>80) vivi=vivi.filter(v=>v.end>c.currentTime);
+  return g;
+}
+function killAll(){
+  if(!ctx) return;
+  vivi.forEach(v=>{ try{ v.g.gain.cancelScheduledValues(ctx.currentTime); v.g.gain.setTargetAtTime(0,ctx.currentTime,.015);}catch(e){} });
+  vivi=[];
+}
+function playNote(midi,t0,dur,dyn){
+  voice(t0,dur,(p,mult)=>{ p.setValueAtTime(freq(midi)*(mult||1),t0); },dyn);
+}
+function playGlide(m1,m2,t0,dur){
+  voice(t0,dur,(p,mult)=>{
+    const k=mult||1;
+    p.setValueAtTime(freq(m1)*k,t0);
+    p.exponentialRampToValueAtTime(freq(m2)*k,t0+dur*.92);
+  });
+}
+function click(t0,accent){
+  const c=audio(); const o=c.createOscillator(); const g=c.createGain();
+  o.type="square"; o.frequency.value=accent?1560:1040;
+  g.gain.setValueAtTime(.22,t0); g.gain.exponentialRampToValueAtTime(.0001,t0+.045);
+  o.connect(g); g.connect(master); o.start(t0); o.stop(t0+.06);
+}
+function startDrone(midi){
+  stopDrone(); if(!S.drone) return;
+  const c=audio(); const g=c.createGain(); g.gain.value=0; g.connect(master);
+  const o1=c.createOscillator(); o1.type="sine"; o1.frequency.value=freq(midi);
+  const o2=c.createOscillator(); o2.type="sine"; o2.frequency.value=freq(midi-12); 
+  const g2=c.createGain(); g2.gain.value=.5; o2.connect(g2); g2.connect(g);
+  o1.connect(g); o1.start(); o2.start();
+  g.gain.setTargetAtTime(.075,c.currentTime,.25);
+  droneNode={g,o1,o2};
+}
+function stopDrone(){
+  if(!droneNode) return;
+  const {g,o1,o2}=droneNode; droneNode=null;
+  try{ g.gain.setTargetAtTime(0,ctx.currentTime,.15); o1.stop(ctx.currentTime+.6); o2.stop(ctx.currentTime+.6);}catch(e){}
+}
+
+/* ============================================================
+   5. COSTRUZIONE TIMELINE
+   ============================================================ */
+function offsets(ex){
+  if(ex.tipo==="scale") return ex.pattern.map(p=>p[0]);
+  if(ex.tipo==="glide") return [ex.glide.from, ex.glide.to];
+  if(ex.tipo==="sustain") return [ex.sustain.off||0];
+  return [0];
+}
+function radici(ex){
+  const o=offsets(ex), top=Math.max(...o), bot=Math.min(...o);
+  const tetto = (S.ceil[ex.registro] ?? S.ceil.misto) - (ex.tettoRel||0);
+  const step = ex.passo||1, n = ex.nStep||8;
+  let hi = tetto - top;
+  let lo = hi - (n-1)*step;
+  const minLo = S.floor - bot;
+  if(lo < minLo) lo = minLo;
+  if(hi < lo) hi = lo;
+  let arr=[]; for(let r=lo;r<=hi;r+=step) arr.push(r);
+  if(!arr.length) arr=[lo];
+  if(ex.discendente) arr.reverse();
+  if(ex.andataRitorno && arr.length>1){ for(let i=arr.length-2;i>=0;i--) arr.push(arr[i]); }
+  return arr;
+}
+function bpmOf(ex){ return Math.max(44, Math.min(180, BPMOV[ex.id] ?? (ex.bpm||90))); }
+
+function timeline(ex){
+  if(ex.tipo==="timer") return {tipo:"timer",dur:ex.durata,ev:[],roots:[]};
+  const spb=60/bpmOf(ex), roots=radici(ex), ev=[];
+  let t=0;
+  roots.forEach((root,ri)=>{
+    const s0=t; let stepIdx=0;
+    if(ex.tipo==="scale"){
+      ex.pattern.forEach(([off,b])=>{
+        const d=b*spb;
+        ev.push({t,dur:d*(ex.staccato?.35:.94),midi:root+off,ri,si:stepIdx++,kind:"guida"});
+        t+=d;
+      });
+    } else if(ex.tipo==="glide"){
+      const d=ex.glide.beats*spb;
+      ev.push({t,dur:d,glide:[root+ex.glide.from,root+ex.glide.to],midi:root+ex.glide.from,ri,si:stepIdx++,kind:"guida"});
+      t+=d;
+      if(ex.glide.back){ ev.push({t,dur:d,glide:[root+ex.glide.to,root+ex.glide.from],midi:root+ex.glide.to,ri,si:stepIdx++,kind:"guida"}); t+=d; }
+    } else if(ex.tipo==="sustain"){
+      const d=ex.sustain.beats*spb;
+      ev.push({t,dur:d,midi:root+(ex.sustain.off||0),ri,si:stepIdx++,kind:"guida",dyn:ex.sustain.dyn});
+      t+=d;
+    }
+    const segLen=t-s0;
+    if(S.risposta && ex.risposta!==false){
+      ev.push({t,dur:segLen,ri,si:-1,kind:"canta",midi:root});
+      t+=segLen;
+    }
+    t += spb*1;
+  });
+  return {tipo:ex.tipo,dur:t,ev,roots};
+}
+
+/* ============================================================
+   6. SEQUENCER
+   ============================================================ */
+const P = {
+  queue:[], idx:0, ex:null, tl:null,
+  playing:false, t0:0, offset:0,
+  sched:null, raf:null, nextEv:0, lastRoot:null
+};
+
+function loadEx(i,autoplay){
+  stop(false);
+  P.idx=Math.max(0,Math.min(P.queue.length-1,i));
+  P.ex=EXBYID[P.queue[P.idx]];
+  P.tl=timeline(P.ex);
+  P.offset=0; P.nextEv=0; P.lastRoot=null;
+  renderPlayer();
+  if(autoplay) play();
+}
+function play(){
+  const c=audio();
+  if(c.state==="suspended") c.resume();
+  P.playing=true;
+  P.t0=c.currentTime-P.offset;
+  document.getElementById("cPlay").innerHTML="&#10074;&#10074;";
+  document.getElementById("cPlay").setAttribute("aria-label","Pausa");
+  if(P.tl.tipo!=="timer"){
+    P.sched=setInterval(tick,25);
+  }
+  P.raf=requestAnimationFrame(frame);
+}
+function pause(){
+  P.playing=false;
+  P.offset=ctx?ctx.currentTime-P.t0:0;
+  clearInterval(P.sched); cancelAnimationFrame(P.raf);
+  if(ctx) ctx.suspend();
+  stopDrone();
+  document.getElementById("cPlay").innerHTML="&#9654;";
+  document.getElementById("cPlay").setAttribute("aria-label","Riprendi");
+}
+function stop(rerender){
+  P.playing=false; P.offset=0; P.nextEv=0; P.lastRoot=null;
+  clearInterval(P.sched); cancelAnimationFrame(P.raf);
+  stopDrone(); killAll();
+  const b=document.getElementById("cPlay");
+  if(b){ b.innerHTML="&#9654;"; b.setAttribute("aria-label","Avvia"); }
+  if(rerender!==false) renderPlayer();
+}
+function tick(){
+  if(!P.playing) return;
+  const now=ctx.currentTime-P.t0, look=now+.25;
+  while(P.nextEv<P.tl.ev.length && P.tl.ev[P.nextEv].t<look){
+    const e=P.tl.ev[P.nextEv++];
+    const at=P.t0+e.t;
+    if(e.kind==="guida"){
+      if(e.glide) playGlide(e.glide[0],e.glide[1],at,e.dur);
+      else playNote(e.midi,at,e.dur,e.dyn);
+      if(S.click && P.ex.tipo==="scale") click(at,e.si===0);
+    }
+  }
+}
+function frame(){
+  if(!P.playing) return;
+  const now=(ctx?ctx.currentTime:0)-P.t0;
+  if(P.tl.tipo==="timer"){
+    const left=Math.max(0,P.tl.dur-now);
+    document.getElementById("pDisplay").innerHTML =
+      `<div class="timer cond">${String(Math.floor(left/60)).padStart(2,"0")}:${String(Math.floor(left%60)).padStart(2,"0")}</div>`;
+    setBar(now/P.tl.dur);
+    if(left<=0){ nextOrEnd(); return; }
+  } else {
+    let cur=null;
+    for(let i=0;i<P.tl.ev.length;i++){ const e=P.tl.ev[i]; if(now>=e.t && now<e.t+e.dur){ cur=e; break; } }
+    paint(cur, now);
+    setBar(now/P.tl.dur);
+    if(now>=P.tl.dur){ nextOrEnd(); return; }
+  }
+  P.raf=requestAnimationFrame(frame);
+}
+function nextOrEnd(){
+  if(P.idx<P.queue.length-1){ loadEx(P.idx+1,true); }
+  else { stop(true); setState("fine"); }
+}
+function setBar(p){ document.getElementById("pBar").style.width=Math.min(100,Math.max(0,p*100))+"%"; }
+
+/* ============================================================
+   7. RENDER
+   ============================================================ */
+const $ = s=>document.querySelector(s);
+function view(id){
+  document.querySelectorAll(".view").forEach(v=>v.classList.remove("on"));
+  $("#v-"+id).classList.add("on");
+  $("#back").hidden = (id==="home");
+  window.scrollTo(0,0);
+}
+function setState(k){
+  const el=$("#pState"); el.className="state cond";
+  const txt={pronto:"PRONTO",ascolta:"ASCOLTA LA GUIDA",canta:"CANTA TU",libero:"SEGUI L'ISTRUZIONE",fine:"SEDUTA COMPLETATA"}[k]||"PRONTO";
+  if(k==="ascolta") el.classList.add("ascolta");
+  if(k==="canta") el.classList.add("canta");
+  el.innerHTML=`<i class="dot"></i><span>${txt}</span>`;
+}
+
+function renderPlayer(){
+  const ex=P.ex, f=FASI.find(x=>x.n===ex.fase);
+  $("#pFase").textContent="FASE "+ex.fase+" · "+f.t.toUpperCase();
+  $("#pPos").textContent = P.queue.length>1 ? `· ${P.idx+1} di ${P.queue.length}` : "";
+  $("#pName").textContent=ex.nome;
+  $("#pSuono").textContent=ex.suono||"";
+  $("#pIstr").textContent=ex.istr;
+  $("#pFonte").textContent=ex.fonte;
+  const w=$("#pWarn"); if(ex.warn){ w.hidden=false; w.textContent=ex.warn; } else w.hidden=true;
+  $("#vBpm").textContent=bpmOf(ex); $("#sBpm").value=bpmOf(ex);
+  $("#sBpm").disabled = ex.tipo==="timer";
+  setState(ex.tipo==="timer"?"libero":"pronto");
+  setBar(0);
+
+  if(ex.tipo==="timer"){
+    $("#pDisplay").innerHTML=`<div class="timer cond">${String(Math.floor(ex.durata/60)).padStart(2,"0")}:${String(ex.durata%60).padStart(2,"0")}</div>
+      <div class="sub">nessun suono, solo tempo</div>`;
+    $("#pPiano").style.display="none"; $("#pSteps").innerHTML="";
+  } else {
+    $("#pPiano").style.display="";
+    const r0=P.tl.roots[0], o=offsets(ex);
+    $("#pDisplay").innerHTML=`
+      <div class="note cond dim">${midiIt(r0)}<sup>${midiEn(r0)}</sup></div>
+      <div class="sub">estensione esercizio: ${midiIt(P.tl.roots.reduce((a,b)=>Math.min(a,b))+Math.min(...o))} → ${midiIt(P.tl.roots.reduce((a,b)=>Math.max(a,b))+Math.max(...o))} · ${P.tl.roots.length} tonalità · ${Math.round(P.tl.dur/60*10)/10} min</div>
+      <div class="syllabig cond">${ex.syl}</div>`;
+    drawPiano(null);
+    const n = ex.tipo==="scale"?ex.pattern.length:(ex.tipo==="glide"?(ex.glide.back?2:1):1);
+    $("#pSteps").innerHTML=Array.from({length:n},()=>"<i></i>").join("");
+  }
+  renderQueue();
+}
+function paint(e,now){
+  const ex=P.ex;
+  if(!e){ setState("pronto"); drawPiano(null); return; }
+  if(e.ri!==P.lastRoot && e.kind==="guida"){ P.lastRoot=e.ri; startDrone(P.tl.roots[e.ri]); }
+  if(e.kind==="canta"){
+    setState("canta");
+    $("#pDisplay").innerHTML=`
+      <div class="note cond dim">${midiIt(e.midi)}<sup>${midiEn(e.midi)}</sup></div>
+      <div class="sub">ripeti la scala appena sentita</div>
+      <div class="syllabig cond">${ex.syl}</div>`;
+    drawPiano(null);
+    $("#pSteps").querySelectorAll("i").forEach(d=>d.className="");
+    return;
+  }
+  setState("ascolta");
+  const m = e.glide ? Math.round(e.glide[0]+(e.glide[1]-e.glide[0])*Math.min(1,(now-e.t)/e.dur)) : e.midi;
+  $("#pDisplay").innerHTML=`
+    <div class="note cond">${midiIt(m)}<sup>${midiEn(m)}</sup></div>
+    <div class="sub">tonalità ${e.ri+1} di ${P.tl.roots.length} · fondamentale ${midiIt(P.tl.roots[e.ri])} · ${Math.round(freq(m)*10)/10} Hz</div>
+    <div class="syllabig cond">${ex.syl}</div>`;
+  drawPiano(m);
+  const dots=$("#pSteps").querySelectorAll("i");
+  dots.forEach((d,i)=>{ d.className = i<e.si?"done":(i===e.si?"now":""); });
+}
+function drawPiano(active){
+  const lo=S.floor-2, hi=Math.max(...Object.values(S.ceil))+2;
+  const whites=[]; for(let m=lo;m<=hi;m++) if(!isBlack(m)) whites.push(m);
+  const w=100/whites.length;
+  let html="";
+  whites.forEach((m,i)=>{ html+=`<div class="wk${m===active?" hit":""}" style="left:${i*w}%;width:${w}%"></div>`; });
+  for(let m=lo;m<=hi;m++){
+    if(!isBlack(m)) continue;
+    const idx=whites.filter(x=>x<m).length;
+    html+=`<div class="bk${m===active?" hit":""}" style="left:${(idx*w-w*0.3)}%;width:${w*0.6}%"></div>`;
+  }
+  const tetto=S.ceil[P.ex?.registro]??S.ceil.misto;
+  const li=whites.filter(x=>x<=tetto).length;
+  html+=`<div class="plimit" style="left:${li*w}%" title="tetto del registro"></div>`;
+  $("#pPiano").innerHTML=html;
+}
+function renderQueue(){
+  if(P.queue.length<2){ $("#pQueue").innerHTML=""; return; }
+  $("#pQueue").innerHTML = `<h4 class="cond" style="font-size:12px;color:var(--fumo);margin:0 0 4px;letter-spacing:.06em">SEDUTA</h4>` +
+    P.queue.map((id,i)=>{
+      const e=EXBYID[id]; const tl=timeline(e);
+      return `<button class="qrow${i===P.idx?" now":""}" data-q="${i}" style="width:100%;text-align:left">
+        <span class="qi cond">${i+1}</span><span>${e.nome}</span>
+        <span class="qs cond">${Math.max(1,Math.round(tl.dur/60))}′</span></button>`;
+    }).join("");
+  $("#pQueue").querySelectorAll("[data-q]").forEach(b=>b.onclick=()=>loadEx(+b.dataset.q,false));
+}
+
+function renderHome(){
+  $("#heroRange").innerHTML = `${midiIt(S.floor)} <em>→</em> ${midiIt(S.ceil.testa)}`;
+  $("#routines").innerHTML = ROUTINES.map(r=>{
+    const min = Math.max(1,Math.round(r.lista.reduce((a,id)=>a+timeline(EXBYID[id]).dur,0)/60));
+    return `<button class="routine" data-r="${r.id}">
+      <span class="min cond">${min}<b>MINUTI</b></span>
+      <span class="txt"><strong>${r.nome}</strong><small>${r.desc}</small></span></button>`;
+  }).join("");
+  $("#routines").querySelectorAll("[data-r]").forEach(b=>b.onclick=()=>{
+    const r=ROUTINES.find(x=>x.id===b.dataset.r);
+    P.queue=r.lista.slice(); $("#crumb").textContent="· "+r.nome.toLowerCase();
+    view("play"); loadEx(0,false);
+  });
+}
+function cue(e){
+  if(!e.suono) return "";
+  const f=e.suono.split(/(?<=[.:])\s/)[0];
+  return f.length>78 ? f.slice(0,76)+"…" : f;
+}
+function renderLib(){
+  $("#v-lib").innerHTML = FASI.map(f=>{
+    const list=EX.filter(e=>e.fase===f.n);
+    return `<div class="fase">
+      <h3 class="cond"><i>FASE ${f.n}</i>${f.t}</h3>
+      <p>${f.d}</p>
+      <div class="exlist">${list.map(e=>`
+        <button class="exrow" data-e="${e.id}">
+          <span class="syl cond">${e.syl}</span>
+          <span class="nm">${e.nome}<small>${e.tipo==="timer"?e.durata+" secondi · senza suono":"guida sonora · "+radici(e).length+" tonalità"}</small><small class="cueline">${cue(e)}</small></span>
+          <span class="go">&#8250;</span>
+        </button>`).join("")}</div>
+    </div>`;
+  }).join("");
+  $("#v-lib").querySelectorAll("[data-e]").forEach(b=>b.onclick=()=>{
+    P.queue=[b.dataset.e]; $("#crumb").textContent="· esercizio singolo";
+    view("play"); loadEx(0,false);
+  });
+}
+function renderSet(){
+  const semiPick=(key,label,help)=>`
+    <div class="rowset">
+      <span>${label}<small>${help}</small></span>
+      <span class="stepper"><button data-dec="${key}">−</button><b id="v-${key}">${midiIt(valOf(key))}</b><button data-inc="${key}">+</button></span>
+    </div>`;
+  $("#v-set").innerHTML=`
+    <div class="set">
+      <h4>La tua estensione</h4>
+      <p>Da baritono, i valori predefiniti sono già tarati. Regolali solo se conosci i tuoi limiti reali: gli esercizi si fermeranno esattamente lì.</p>
+      ${semiPick("floor","Nota più grave","dove partono le scale discendenti")}
+      ${semiPick("petto","Tetto voce di petto","oltre questo, di petto si spinge")}
+      ${semiPick("misto","Tetto del mix","la zona di lavoro vera per il pop")}
+      ${semiPick("testa","Tetto voce di testa","falsetto e testa leggera")}
+      ${semiPick("sovt","Tetto SOVT","lip trill e cannuccia, puoi osare di più")}
+    </div>
+    <div class="set">
+      <h4>Suono guida</h4>
+      <p>Che timbro suona le note che devi imitare.</p>
+      <div class="pick" id="pickTimbro">
+        <button data-t="piano">Pianoforte</button>
+        <button data-t="voce">Voce sintetica</button>
+      </div>
+    </div>
+    <div class="set">
+      <h4>Modo di lavoro</h4>
+      <div class="rowset"><span>Ascolta, poi canta<small>Dopo ogni scala lascia un silenzio della stessa lunghezza per la tua risposta</small></span><button class="tog" data-tog="risposta"><i></i></button></div>
+      <div class="rowset"><span>Nota di riferimento<small>Un bordone tiene la fondamentale mentre canti</small></span><button class="tog" data-tog="drone"><i></i></button></div>
+      <div class="rowset"><span>Metronomo<small>Un click su ogni nota della scala</small></span><button class="tog" data-tog="click"><i></i></button></div>
+    </div>
+    <p class="note-help">Non serve microfono: l'app non ti ascolta e non ti giudica. Suona la guida, tu la ripeti. Se una nota ti costa fatica, non è quella la nota da forzare: è il segnale che serve un esercizio più leggero prima.</p>`;
+  syncSet();
+  $("#v-set").querySelectorAll("[data-dec]").forEach(b=>b.onclick=()=>bump(b.dataset.dec,-1));
+  $("#v-set").querySelectorAll("[data-inc]").forEach(b=>b.onclick=()=>bump(b.dataset.inc,+1));
+  $("#pickTimbro").querySelectorAll("button").forEach(b=>b.onclick=()=>{S.timbro=b.dataset.t;saveS();syncSet();});
+  $("#v-set").querySelectorAll("[data-tog]").forEach(b=>b.onclick=()=>{
+    S[b.dataset.tog]=!S[b.dataset.tog]; saveS(); syncSet();
+    if(!S.drone) stopDrone();
+    if(P.ex){ P.tl=timeline(P.ex); }
+  });
+}
+const valOf = k => k==="floor" ? S.floor : S.ceil[k];
+function bump(k,d){
+  if(k==="floor") S.floor=Math.max(33,Math.min(60,S.floor+d));
+  else S.ceil[k]=Math.max(55,Math.min(84,S.ceil[k]+d));
+  saveS(); syncSet(); renderHome(); renderLib();
+  if(P.ex){ stop(false); P.tl=timeline(P.ex); renderPlayer(); }
+}
+function syncSet(){
+  ["floor","petto","misto","testa","sovt"].forEach(k=>{ const el=$("#v-"+k); if(el) el.textContent=midiIt(valOf(k))+" ("+midiEn(valOf(k))+")"; });
+  $("#pickTimbro")?.querySelectorAll("button").forEach(b=>b.classList.toggle("on",b.dataset.t===S.timbro));
+  $("#v-set")?.querySelectorAll("[data-tog]").forEach(b=>b.classList.toggle("on",!!S[b.dataset.tog]));
+}
+
+/* ============================================================
+   8. EVENTI
+   ============================================================ */
+$("#cPlay").onclick=()=>{ P.playing?pause():play(); };
+$("#cNext").onclick=()=>{ if(P.idx<P.queue.length-1) loadEx(P.idx+1,P.playing); else { stop(); } };
+$("#cPrev").onclick=()=>{
+  const el = P.playing && ctx ? ctx.currentTime-P.t0 : P.offset;
+  if(el>3 || P.idx===0){ const wasP=P.playing; stop(false); renderPlayer(); if(wasP) play(); }
+  else loadEx(P.idx-1,P.playing);
+};
+$("#sBpm").oninput=e=>{
+  if(!P.ex) return;
+  BPMOV[P.ex.id]=+e.target.value;
+  $("#vBpm").textContent=e.target.value;
+  const wasP=P.playing; stop(false); P.tl=timeline(P.ex); renderPlayer(); if(wasP) play();
+};
+$("#sVol").oninput=e=>{ S.vol=+e.target.value; $("#vVol").textContent=S.vol; setVol(); saveS(); };
+$("#back").onclick=()=>{ stop(false); view("home"); $("#crumb").textContent="· baritono"; renderHome(); };
+$("#toLib").onclick=()=>{ stop(false); renderLib(); view("lib"); $("#crumb").textContent="· libreria"; };
+$("#toSet").onclick=()=>{ stop(false); renderSet(); view("set"); $("#crumb").textContent="· impostazioni"; };
+$("#openLib").onclick=()=>{ renderLib(); view("lib"); $("#crumb").textContent="· libreria"; };
+$("#heroEdit").onclick=()=>{ renderSet(); view("set"); $("#crumb").textContent="· impostazioni"; };
+document.addEventListener("keydown",e=>{
+  if(e.code==="Space" && $("#v-play").classList.contains("on")){ e.preventDefault(); P.playing?pause():play(); }
+});
+document.addEventListener("visibilitychange",()=>{ if(document.hidden && P.playing) pause(); });
+
+/* ============================================================
+   9. AVVIO
+   ============================================================ */
+(async function init(){
+  await loadS();
+  $("#sVol").value=S.vol; $("#vVol").textContent=S.vol;
+  $("#nEx").innerHTML = EX.length + "<b>ESERCIZI</b>";
+  renderHome(); renderLib();
+})();
+</script>
+</body>
+</html>
