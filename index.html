@@ -157,10 +157,10 @@ h2.sec{
 .bar i{display:block;height:100%;background:var(--ambra);width:0%;transition:width .2s linear}
 
 /* controls */
-.ctrls{display:flex;align-items:center;justify-content:center;gap:14px;margin:18px 0 6px}
-.cbtn{width:52px;height:52px;border-radius:99px;border:1px solid var(--bordo);display:grid;place-items:center;color:var(--fumo)}
+.ctrls{display:flex;align-items:center;justify-content:center;gap:20px;margin:20px 0 6px}
+.cbtn{width:64px;height:64px;font-size:20px;border-radius:99px;border:1px solid var(--bordo);display:grid;place-items:center;color:var(--fumo)}
 .cbtn:hover{color:var(--osso);border-color:var(--fumo)}
-.cbtn.play{width:70px;height:70px;background:var(--ambra);color:var(--nero);border-color:var(--ambra)}
+.cbtn.play{width:92px;height:92px;font-size:28px;background:var(--ambra);color:var(--nero);border-color:var(--ambra)}
 .cbtn.play:hover{color:var(--nero);background:#f0b257}
 
 .knobs{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
@@ -206,10 +206,13 @@ h2.sec{
 .tog i{position:absolute;top:3px;left:3px;width:21px;height:21px;border-radius:99px;background:var(--fumo);transition:left .15s,background .15s}
 .tog.on{background:rgba(232,163,61,.35)}
 .tog.on i{left:22px;background:var(--ambra)}
+#errbar{position:fixed;left:0;right:0;bottom:0;z-index:99;background:var(--ruggine);color:#fff;
+  padding:10px 14px calc(10px + var(--safe-b));font-size:12.5px;line-height:1.4}
 .note-help{font-size:12.5px;color:var(--fumo);margin-top:16px;line-height:1.6}
 </style>
 </head>
 <body>
+<div id="errbar" hidden></div>
 <div id="app">
   <div class="topbar">
     <button class="iconbtn" id="back" hidden aria-label="Indietro">&#8249;</button>
@@ -295,6 +298,10 @@ h2.sec{
 
 <script>
 "use strict";
+window.onerror=function(msg,src,line){
+  const b=document.getElementById("errbar");
+  if(b){ b.hidden=false; b.textContent="Problema tecnico: "+msg+" (riga "+line+"). Ricarica la pagina."; }
+};
 /* ============================================================
    1. NOTE E UTILITÀ
    ============================================================ */
@@ -561,6 +568,52 @@ cooldown3:"Respira come quando ti stendi a letto dopo una giornata lunga: espira
 };
 EX.forEach(e=>{ if(SUONO[e.id]) e.suono=SUONO[e.id]; });
 
+/* Copione parlato: cosa la guida vocale dice prima di far partire l'esercizio.
+   Frasi corte, pensate per essere ASCOLTATE mentre si guida: nome + come si fa. */
+const VOCE = {
+corpo:"Sblocco del corpo. Muoviti come prima di una partita: braccia, spalle, collo. Poi scendi verso i piedi e risali piano, una vertebra alla volta.",
+postura:"Allineamento. In piedi, piedi larghi come il bacino. Spalle giù, ginocchia morbide, mai bloccate.",
+respiro:"Respiro costale, e poi la esse acca. Mano sul fianco: le coste si allargano da sole. Poi soffia una esse lunga e costante, con la gola aperta.",
+lingua:"Lingua, mascella e collo. Lingua fuori cinque secondi, tre volte. Poi mascella molle, come se masticassi una gomma enorme.",
+dizione:"Scioglilingua. Parti lentissimo e pulito: acceleri solo finché resta preciso.",
+
+lip5:"Lip trill discendente. È il brrr di quando rientri in casa dal freddo. Labbra molli, aria continua: se si ferma a metà scala, è calata l'aria.",
+straw:"Cannuccia, sirena di ottava. Canta dentro la cannuccia come se bevessi un frappè. Labbra chiuse intorno, guance ferme.",
+ng:"Sirena su enne gi. È il suono di mangiare: la lingua resta incollata in alto e dietro, e il suono esce dal naso.",
+vz:"Vi e zeta sostenute. La vi è il ronzio dell'ape, la zeta è la zanzara. Suono continuo e compatto, senza aria che scappa.",
+rr:"Trillo di lingua. La erre arrotata di quando imiti un motore. La punta della lingua sbatte da sola: non la spingi tu.",
+
+oo54:"Voce di testa, cinque quattro tre due uno. È l'uuh del gufo: labbra a beccuccio, suono piccolo, come se cantassi per non svegliare nessuno.",
+ee181:"Arpeggio di testa. L'iih stretto e sottile, la vocetta del topolino. Punta il suono dietro agli occhi.",
+wee8:"Ottava lenta sostenuta. Il weee del bambino sullo scivolo. Ma le due note vanno toccate pulite: due gradini, non una rampa.",
+falsetto:"Sirena in falsetto. Come una sirena lontana. Lascia che la voce si assottigli mentre sale: basta che non si interrompa.",
+
+bah131:"Bah, uno tre cinque tre uno. La voce con cui chiami qualcuno dall'altra parte della strada: piena e aperta, ma non urlata.",
+goh54:"Goh, cinque quattro tre due uno. L'oooh di quando vedi qualcosa di bello. Rotondo, grosso, bocca davvero aperta.",
+mum9:"Scala su mum. A ogni nota devi sentire un solletico sulle labbra: se sparisce, il suono è scivolato indietro.",
+messa:"Messa di voce. Come un'auto che si avvicina e poi si allontana: cambia solo il volume, la vocale resta identica.",
+
+nay131:"Nay, uno tre cinque tre uno. Nasale e stretta, la voce della strega. Se ti sembra brutta, è esattamente giusta.",
+bib181:"Bib, uno cinque otto cinque uno. Dillo come se chiamassi un bambino piccolo: la bi chiude, la i tiene il suono sottile.",
+goog:"Goog, arpeggio di ottava. Come quando dici guuu a un neonato. La bocca resta quasi immobile mentre sali.",
+mum851:"Mix di testa, otto cinque tre uno. Parti già leggero in alto e scendi senza che la voce scatti in petto a metà strada.",
+scala9:"Scala di ottava completa. Un gradino per nota: nessuno più alto degli altri solo perché è più in su. Sali su a, scendi su i.",
+
+agilita:"Agilità, scala veloce. Come quando ridi a scatti. Ogni nota è un impulso che parte da dentro: la mascella non si muove.",
+staccato:"Arpeggio staccato. Una risata trattenuta: ha, ha. Niente soffio prima della nota, niente colpo di gola dietro.",
+riff:"Riff pentatonico. Il whoa con cui commenti una giocata in televisione, ma sceso nota per nota. All'inizio lentissimo.",
+sustain:"Nota lunga con vibrato. Prima metà dritta come un filo teso. Poi lascia arrivare il vibrato da solo: non lo fabbrichi con la pancia.",
+fry:"Vocal fry verso il mix. Il crepitio della voce appena sveglio. Da lì apri sulla nota, con la stessa sensazione di aria minima.",
+soffio:"Suono soffiato. La voce con cui racconti un segreto vicino all'orecchio. Poi rifai la stessa frase pulita.",
+flip:"Flip volontario. Come lo yodel: fai crepare la voce di proposito nel salto. Qui la crepa è l'esercizio, non l'errore.",
+twang:"Twang controllato. Il verso del gatto che protesta: nnnya. Stretto e tagliente, ma non deve mai grattare.",
+
+cooldown1:"Defaticamento, lip trill. Lo stesso brrr di prima, ma con l'energia di chi sta per addormentarsi.",
+cooldown2:"Sirena discendente su emme. Labbra chiuse, denti leggermente staccati dentro. Lascia che il suono si posi verso il basso.",
+cooldown3:"Respiro finale. Espirazione più lunga dell'inspirazione, senza contare niente."
+};
+EX.forEach(e=>{ if(VOCE[e.id]) e.voce=VOCE[e.id]; });
+
 const EXBYID = Object.fromEntries(EX.map(e=>[e.id,e]));
 
 /* ---------- ROUTINE ---------- */
@@ -590,7 +643,10 @@ const DEF = {
   drone:false,
   click:false,
   bpmAdj:0,
-  vol:70
+  vol:70,
+  voce:true,        // guida vocale parlata prima di ogni esercizio
+  schermo:true,     // tiene lo schermo acceso durante la seduta
+  vvel:0.98         // velocità della voce parlata
 };
 let S = Object.assign({},DEF,{ceil:Object.assign({},DEF.ceil)});
 
@@ -613,8 +669,93 @@ function audio(){
   const comp = ctx.createDynamicsCompressor();
   comp.threshold.value=-16; comp.ratio.value=4;
   master.connect(comp); comp.connect(ctx.destination);
+  // se il sistema operativo interrompe l'audio (chiamata, cambio app, risparmio
+  // energetico) proviamo a farlo ripartire da soli invece di restare muti
+  ctx.addEventListener && ctx.addEventListener("statechange",()=>{
+    if(P.playing && !P.speaking && ctx.state!=="running"){
+      ctx.resume().then(resync).catch(()=>{});
+    }
+  });
   return ctx;
 }
+
+/* Tono di mantenimento: 20 Hz a volume bassissimo, fuori dalla soglia udibile.
+   Serve solo a tenere vivo il flusso audio verso l'impianto dell'auto: durante i
+   silenzi dell'esercizio il Bluetooth, se non riceve piu' nulla, ridarebbe la
+   riproduzione alla radio. */
+let ka=null;
+function keepAlive(on){
+  try{
+    if(on){
+      if(ka) return;
+      const c=audio();
+      const o=c.createOscillator(), g=c.createGain();
+      o.frequency.value=20; g.gain.value=0.005;
+      o.connect(g); g.connect(c.destination); o.start();
+      ka={o:o,g:g};
+    }else if(ka){
+      try{ ka.o.stop(); }catch(e){}
+      ka.o.disconnect(); ka.g.disconnect(); ka=null;
+    }
+  }catch(e){ ka=null; }
+}
+
+/* Blocco schermo: durante la seduta lo schermo resta acceso, cosi' il telefono
+   non sospende l'app a meta' esercizio. */
+let wl=null;
+async function wake(on){
+  try{
+    if(on && S.schermo && navigator.wakeLock && !wl){
+      wl = await navigator.wakeLock.request("screen");
+      wl.addEventListener("release", ()=>{ wl=null; });
+    }else if(!on && wl){ await wl.release(); wl=null; }
+  }catch(e){ wl=null; }
+}
+
+/* ---------- GUIDA VOCALE ----------
+   Legge il nome dell'esercizio e come si fa, prima che partano le note.
+   Usa la voce italiana del telefono: nessun file da scaricare, funziona
+   anche senza rete. */
+let vSel=null;
+function pickVoice(){
+  if(!("speechSynthesis" in window)) return null;
+  const all = speechSynthesis.getVoices() || [];
+  const it = all.filter(v=>/^it/i.test(v.lang||""));
+  if(!it.length) return null;
+  const score = v=>{
+    const n=(v.name||"").toLowerCase(); let p=0;
+    if(/premium|enhanced|neural|natural|siri/.test(n)) p+=6;
+    if(/google/.test(n)) p+=4;
+    if(/alice|federica|luca|elsa|carlo|emma/.test(n)) p+=2;
+    if(v.localService) p+=1;
+    return p;
+  };
+  return it.slice().sort((a,b)=>score(b)-score(a))[0];
+}
+if("speechSynthesis" in window){
+  vSel=pickVoice();
+  try{ speechSynthesis.onvoiceschanged=()=>{ vSel=pickVoice(); }; }catch(e){}
+}
+function speak(txt, done){
+  if(!("speechSynthesis" in window) || !txt){ done && done(); return; }
+  try{
+    speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(txt);
+    u.lang="it-IT"; u.rate=S.vvel||0.98; u.pitch=1;
+    u.volume=Math.max(0.45, Math.min(1, (S.vol||70)/100+0.25));
+    if(!vSel) vSel=pickVoice();
+    if(vSel) u.voice=vSel;
+    P.speaking=true;
+    let fatto=false;
+    const fine=()=>{ if(fatto) return; fatto=true; clearTimeout(P.vTo); P.speaking=false; done && done(); };
+    u.onend=fine; u.onerror=fine;
+    // rete di sicurezza: su alcuni telefoni la fine della voce non viene mai segnalata
+    const stima = 1800 + (txt.split(/\s+/).length/2.3)*1000/(S.vvel||0.98);
+    P.vTo = setTimeout(fine, Math.min(30000, stima+2500));
+    speechSynthesis.speak(u);
+  }catch(e){ P.speaking=false; done && done(); }
+}
+function shutUp(){ try{ clearTimeout(P.vTo); speechSynthesis.cancel(); }catch(e){} P.speaking=false; }
 function setVol(){ if(master) master.gain.setTargetAtTime(S.vol/100*0.5, ctx.currentTime, .02); }
 
 // timbro "piano": triangolo + armoniche, decadimento
@@ -727,6 +868,7 @@ function radici(ex){
   if(ex.andataRitorno && arr.length>1){ for(let i=arr.length-2;i>=0;i--) arr.push(arr[i]); }
   return arr;
 }
+const BPMOV={};   // tempo personalizzato per singolo esercizio
 function bpmOf(ex){ return Math.max(44, Math.min(180, BPMOV[ex.id] ?? (ex.bpm||90))); }
 
 function timeline(ex){
@@ -767,7 +909,8 @@ function timeline(ex){
 const P = {
   queue:[], idx:0, ex:null, tl:null,
   playing:false, t0:0, offset:0,
-  sched:null, raf:null, nextEv:0, lastRoot:null
+  sched:null, raf:null, nextEv:0, lastRoot:null,
+  speaking:false, spoken:false, vTo:null, watch:null, lastFrame:0, pos:0
 };
 
 function loadEx(i,autoplay){
@@ -775,42 +918,88 @@ function loadEx(i,autoplay){
   P.idx=Math.max(0,Math.min(P.queue.length-1,i));
   P.ex=EXBYID[P.queue[P.idx]];
   P.tl=timeline(P.ex);
-  P.offset=0; P.nextEv=0; P.lastRoot=null;
+  P.offset=0; P.nextEv=0; P.lastRoot=null; P.pos=0; P.spoken=false;
   renderPlayer();
+  saveSess();
   if(autoplay) play();
+}
+function saveSess(){
+  try{ store.set("studiovoce:sess", JSON.stringify({q:P.queue,i:P.idx,c:$("#crumb").textContent})); }catch(e){}
+}
+function btnPlay(lab){
+  const b=document.getElementById("cPlay"); if(!b) return;
+  b.innerHTML="&#9654;"; b.setAttribute("aria-label",lab||"Avvia");
+}
+function btnPausa(){
+  const b=document.getElementById("cPlay"); if(!b) return;
+  b.innerHTML="&#10074;&#10074;"; b.setAttribute("aria-label","Pausa");
 }
 function play(){
   const c=audio();
-  if(c.state==="suspended") c.resume();
-  P.playing=true;
+  if(c.state!=="running") c.resume();
+  wake(true);
+  P.playing=true; btnPausa();
+  clearInterval(P.watch); P.watch=setInterval(watchdog,1000);
+  // guida vocale: solo all'inizio dell'esercizio, non alla ripresa da pausa
+  if(S.voce && P.offset===0 && !P.spoken && P.ex && P.ex.voce){
+    P.spoken=true; setState("voce");
+    speak(P.ex.voce, ()=>{ if(P.playing) avvia(); });
+  }else avvia();
+}
+function avvia(){
+  const c=audio();
+  if(c.state!=="running") c.resume();
+  P.speaking=false;
+  keepAlive(true);
   P.t0=c.currentTime-P.offset;
-  document.getElementById("cPlay").innerHTML="&#10074;&#10074;";
-  document.getElementById("cPlay").setAttribute("aria-label","Pausa");
-  if(P.tl.tipo!=="timer"){
-    P.sched=setInterval(tick,25);
-  }
-  P.raf=requestAnimationFrame(frame);
+  P.lastFrame=Date.now();
+  clearInterval(P.sched);
+  if(P.tl.tipo!=="timer") P.sched=setInterval(tick,25);
+  cancelAnimationFrame(P.raf); P.raf=requestAnimationFrame(frame);
 }
 function pause(){
-  P.playing=false;
-  P.offset=ctx?ctx.currentTime-P.t0:0;
-  clearInterval(P.sched); cancelAnimationFrame(P.raf);
+  const parlava=P.speaking;
+  P.playing=false; shutUp();
+  if(ctx && !parlava) P.offset=ctx.currentTime-P.t0;
+  clearInterval(P.sched); clearInterval(P.watch); cancelAnimationFrame(P.raf);
   if(ctx) ctx.suspend();
-  stopDrone();
-  document.getElementById("cPlay").innerHTML="&#9654;";
-  document.getElementById("cPlay").setAttribute("aria-label","Riprendi");
+  stopDrone(); wake(false);
+  btnPlay("Riprendi");
 }
 function stop(rerender){
-  P.playing=false; P.offset=0; P.nextEv=0; P.lastRoot=null;
-  clearInterval(P.sched); cancelAnimationFrame(P.raf);
-  stopDrone(); killAll();
-  const b=document.getElementById("cPlay");
-  if(b){ b.innerHTML="&#9654;"; b.setAttribute("aria-label","Avvia"); }
+  P.playing=false; P.offset=0; P.nextEv=0; P.lastRoot=null; P.pos=0; P.spoken=false;
+  shutUp();
+  clearInterval(P.sched); clearInterval(P.watch); cancelAnimationFrame(P.raf);
+  stopDrone(); killAll(); keepAlive(false); wake(false);
+  btnPlay("Avvia");
   if(rerender!==false) renderPlayer();
 }
+
+/* Controllo periodico: se il sistema ha messo in pausa l'audio o ha congelato
+   il disegno mentre la seduta e' in corso, qui si riparte da soli. */
+function watchdog(){
+  if(!P.playing || P.speaking) return;
+  if(ctx && ctx.state!=="running"){ ctx.resume().then(resync).catch(()=>{}); return; }
+  if(!document.hidden && Date.now()-P.lastFrame>1500){
+    cancelAnimationFrame(P.raf); P.lastFrame=Date.now(); P.raf=requestAnimationFrame(frame);
+  }
+}
+/* Rimette in fila le note dopo un'interruzione, ripartendo dal punto giusto. */
+function resync(){
+  if(!ctx || !P.playing || !P.tl) return;
+  killAll();
+  const pos=Math.max(0, Math.min(P.tl.dur, P.pos));
+  P.t0=ctx.currentTime-pos;
+  P.nextEv=0;
+  while(P.nextEv<P.tl.ev.length && P.tl.ev[P.nextEv].t<pos) P.nextEv++;
+  P.lastFrame=Date.now();
+}
 function tick(){
-  if(!P.playing) return;
-  const now=ctx.currentTime-P.t0, look=now+.25;
+  if(!P.playing || P.speaking || !ctx) return;
+  const now=ctx.currentTime-P.t0;
+  P.pos=now;
+  // a schermo spento il telefono rallenta i timer: prepariamo piu' note in anticipo
+  const look=now+(document.hidden?2.5:0.25);
   while(P.nextEv<P.tl.ev.length && P.tl.ev[P.nextEv].t<look){
     const e=P.tl.ev[P.nextEv++];
     const at=P.t0+e.t;
@@ -822,8 +1011,10 @@ function tick(){
   }
 }
 function frame(){
-  if(!P.playing) return;
+  if(!P.playing || P.speaking) return;
+  P.lastFrame=Date.now();
   const now=(ctx?ctx.currentTime:0)-P.t0;
+  P.pos=now;
   if(P.tl.tipo==="timer"){
     const left=Math.max(0,P.tl.dur-now);
     document.getElementById("pDisplay").innerHTML =
@@ -841,7 +1032,10 @@ function frame(){
 }
 function nextOrEnd(){
   if(P.idx<P.queue.length-1){ loadEx(P.idx+1,true); }
-  else { stop(true); setState("fine"); }
+  else {
+    stop(true); setState("fine");
+    if(S.voce) speak("Seduta completata.");
+  }
 }
 function setBar(p){ document.getElementById("pBar").style.width=Math.min(100,Math.max(0,p*100))+"%"; }
 
@@ -857,8 +1051,8 @@ function view(id){
 }
 function setState(k){
   const el=$("#pState"); el.className="state cond";
-  const txt={pronto:"PRONTO",ascolta:"ASCOLTA LA GUIDA",canta:"CANTA TU",libero:"SEGUI L'ISTRUZIONE",fine:"SEDUTA COMPLETATA"}[k]||"PRONTO";
-  if(k==="ascolta") el.classList.add("ascolta");
+  const txt={pronto:"PRONTO",ascolta:"ASCOLTA LA GUIDA",canta:"CANTA TU",libero:"SEGUI L'ISTRUZIONE",fine:"SEDUTA COMPLETATA",voce:"LA GUIDA TI SPIEGA"}[k]||"PRONTO";
+  if(k==="ascolta"||k==="voce") el.classList.add("ascolta");
   if(k==="canta") el.classList.add("canta");
   el.innerHTML=`<i class="dot"></i><span>${txt}</span>`;
 }
@@ -1009,6 +1203,18 @@ function renderSet(){
       </div>
     </div>
     <div class="set">
+      <h4>Guida vocale</h4>
+      <p>Prima di ogni esercizio una voce ti dice il nome e come si fa, così in macchina non devi guardare lo schermo.</p>
+      <div class="rowset"><span>Spiegazione parlata<small>La voce parla, poi partono le note</small></span><button class="tog" data-tog="voce"><i></i></button></div>
+      <div class="rowset"><span>Tieni acceso lo schermo<small>Impedisce al telefono di sospendere la seduta a metà</small></span><button class="tog" data-tog="schermo"><i></i></button></div>
+      <div class="rowset">
+        <span>Velocità della voce<small id="vNomeVoce">voce del telefono</small></span>
+        <span class="stepper"><button data-vv="-1">−</button><b id="v-vvel">${Math.round((S.vvel||.98)*100)}</b><button data-vv="1">+</button></span>
+      </div>
+      <div class="pick" id="pickProva"><button data-prova="1">Prova la voce</button></div>
+      <p class="note-help" style="margin-top:10px">La qualità dipende dalla voce italiana installata sul telefono. Su iPhone, in Impostazioni › Accessibilità › Contenuto pronunciato › Voci › Italiano, scarica una voce <b>Premium</b> o <b>Migliorata</b>: la differenza è netta e poi funziona anche senza rete.</p>
+    </div>
+    <div class="set">
       <h4>Modo di lavoro</h4>
       <div class="rowset"><span>Ascolta, poi canta<small>Dopo ogni scala lascia un silenzio della stessa lunghezza per la tua risposta</small></span><button class="tog" data-tog="risposta"><i></i></button></div>
       <div class="rowset"><span>Nota di riferimento<small>Un bordone tiene la fondamentale mentre canti</small></span><button class="tog" data-tog="drone"><i></i></button></div>
@@ -1019,6 +1225,14 @@ function renderSet(){
   $("#v-set").querySelectorAll("[data-dec]").forEach(b=>b.onclick=()=>bump(b.dataset.dec,-1));
   $("#v-set").querySelectorAll("[data-inc]").forEach(b=>b.onclick=()=>bump(b.dataset.inc,+1));
   $("#pickTimbro").querySelectorAll("button").forEach(b=>b.onclick=()=>{S.timbro=b.dataset.t;saveS();syncSet();});
+  $("#v-set").querySelectorAll("[data-vv]").forEach(b=>b.onclick=()=>{
+    S.vvel=Math.max(0.7,Math.min(1.3,Math.round(((S.vvel||.98)+0.04*(+b.dataset.vv))*100)/100));
+    saveS(); syncSet();
+  });
+  $("#v-set").querySelectorAll("[data-prova]").forEach(b=>b.onclick=()=>{
+    shutUp();
+    speak("Lip trill discendente. \u00c8 il brrr di quando rientri in casa dal freddo: labbra molli, aria continua.");
+  });
   $("#v-set").querySelectorAll("[data-tog]").forEach(b=>b.onclick=()=>{
     S[b.dataset.tog]=!S[b.dataset.tog]; saveS(); syncSet();
     if(!S.drone) stopDrone();
@@ -1036,6 +1250,12 @@ function syncSet(){
   ["floor","petto","misto","testa","sovt"].forEach(k=>{ const el=$("#v-"+k); if(el) el.textContent=midiIt(valOf(k))+" ("+midiEn(valOf(k))+")"; });
   $("#pickTimbro")?.querySelectorAll("button").forEach(b=>b.classList.toggle("on",b.dataset.t===S.timbro));
   $("#v-set")?.querySelectorAll("[data-tog]").forEach(b=>b.classList.toggle("on",!!S[b.dataset.tog]));
+  const vv=$("#v-vvel"); if(vv) vv.textContent=Math.round((S.vvel||.98)*100);
+  const nv=$("#vNomeVoce");
+  if(nv){
+    if(!vSel) vSel=pickVoice();
+    nv.textContent = vSel ? vSel.name : (("speechSynthesis" in window) ? "nessuna voce italiana trovata" : "voce non disponibile su questo browser");
+  }
 }
 
 /* ============================================================
@@ -1055,7 +1275,7 @@ $("#sBpm").oninput=e=>{
   const wasP=P.playing; stop(false); P.tl=timeline(P.ex); renderPlayer(); if(wasP) play();
 };
 $("#sVol").oninput=e=>{ S.vol=+e.target.value; $("#vVol").textContent=S.vol; setVol(); saveS(); };
-$("#back").onclick=()=>{ stop(false); view("home"); $("#crumb").textContent="· baritono"; renderHome(); };
+$("#back").onclick=()=>{ stop(false); view("home"); $("#crumb").textContent="· baritono"; renderHome(); store.set("studiovoce:sess",""); };
 $("#toLib").onclick=()=>{ stop(false); renderLib(); view("lib"); $("#crumb").textContent="· libreria"; };
 $("#toSet").onclick=()=>{ stop(false); renderSet(); view("set"); $("#crumb").textContent="· impostazioni"; };
 $("#openLib").onclick=()=>{ renderLib(); view("lib"); $("#crumb").textContent="· libreria"; };
@@ -1063,7 +1283,17 @@ $("#heroEdit").onclick=()=>{ renderSet(); view("set"); $("#crumb").textContent="
 document.addEventListener("keydown",e=>{
   if(e.code==="Space" && $("#v-play").classList.contains("on")){ e.preventDefault(); P.playing?pause():play(); }
 });
-document.addEventListener("visibilitychange",()=>{ if(document.hidden && P.playing) pause(); });
+/* Prima l'app si metteva in pausa da sola quando lo schermo si spegneva: era
+   questo a interrompere l'esercizio a meta' e a ridare l'audio alla radio.
+   Ora la seduta prosegue, e al ritorno si risincronizza. */
+document.addEventListener("visibilitychange",()=>{
+  if(document.hidden) return;
+  wake(true);
+  if(P.playing && !P.speaking){
+    if(ctx && ctx.state!=="running") ctx.resume().then(resync).catch(()=>{});
+    cancelAnimationFrame(P.raf); P.lastFrame=Date.now(); P.raf=requestAnimationFrame(frame);
+  }
+});
 
 /* ============================================================
    9. AVVIO
@@ -1073,6 +1303,18 @@ document.addEventListener("visibilitychange",()=>{ if(document.hidden && P.playi
   $("#sVol").value=S.vol; $("#vVol").textContent=S.vol;
   $("#nEx").innerHTML = EX.length + "<b>ESERCIZI</b>";
   renderHome(); renderLib();
+  try{
+    const raw = await store.get("studiovoce:sess");
+    if(raw){
+      const o = JSON.parse(raw);
+      if(o && Array.isArray(o.q) && o.q.length && o.q.every(id=>EXBYID[id])){
+        P.queue = o.q;
+        $("#crumb").textContent = o.c || "· ripresa";
+        view("play");
+        loadEx(Math.min(o.i||0, o.q.length-1), false);
+      }
+    }
+  }catch(e){}
 })();
 </script>
 </body>
