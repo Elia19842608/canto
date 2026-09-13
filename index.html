@@ -644,6 +644,7 @@ const DEF = {
   click:false,
   bpmAdj:0,
   vol:70,
+  modo:"attacco",   // "attacco" = scala una volta sola, poi solo la nota di partenza
   voce:true,        // guida vocale parlata prima di ogni esercizio
   schermo:true,     // tiene lo schermo acceso durante la seduta
   vvel:0.98         // velocità della voce parlata
@@ -871,35 +872,78 @@ function radici(ex){
 const BPMOV={};   // tempo personalizzato per singolo esercizio
 function bpmOf(ex){ return Math.max(44, Math.min(180, BPMOV[ex.id] ?? (ex.bpm||90))); }
 
+/* La prima nota dell'esercizio: quella da cui parte il tuo cantato. */
+function primaNota(ex, root){
+  if(ex.tipo==="scale")   return root + ex.pattern[0][0];
+  if(ex.tipo==="glide")   return root + ex.glide.from;
+  if(ex.tipo==="sustain") return root + (ex.sustain.off||0);
+  return root;
+}
+/* Quanto dura un giro completo dell'esercizio, in secondi. */
+function duraGiro(ex, spb){
+  if(ex.tipo==="scale")   return ex.pattern.reduce((a,[,b])=>a+b,0)*spb;
+  if(ex.tipo==="glide")   return ex.glide.beats*spb*(ex.glide.back?2:1);
+  if(ex.tipo==="sustain") return ex.sustain.beats*spb;
+  return spb*4;
+}
+/* Scrive nella scaletta il giro suonato dalla guida. */
+function spingiGiro(ev, ex, root, ri, t, spb, demo){
+  let si=0;
+  if(ex.tipo==="scale"){
+    ex.pattern.forEach(([off,b])=>{
+      const d=b*spb;
+      ev.push({t,dur:d*(ex.staccato?.35:.94),midi:root+off,ri,si:si++,kind:"guida",demo:!!demo});
+      t+=d;
+    });
+  } else if(ex.tipo==="glide"){
+    const d=ex.glide.beats*spb;
+    ev.push({t,dur:d,glide:[root+ex.glide.from,root+ex.glide.to],midi:root+ex.glide.from,ri,si:si++,kind:"guida",demo:!!demo});
+    t+=d;
+    if(ex.glide.back){ ev.push({t,dur:d,glide:[root+ex.glide.to,root+ex.glide.from],midi:root+ex.glide.to,ri,si:si++,kind:"guida",demo:!!demo}); t+=d; }
+  } else if(ex.tipo==="sustain"){
+    const d=ex.sustain.beats*spb;
+    ev.push({t,dur:d,midi:root+(ex.sustain.off||0),ri,si:si++,kind:"guida",dyn:ex.sustain.dyn,demo:!!demo});
+    t+=d;
+  }
+  return t;
+}
+
 function timeline(ex){
   if(ex.tipo==="timer") return {tipo:"timer",dur:ex.durata,ev:[],roots:[]};
   const spb=60/bpmOf(ex), roots=radici(ex), ev=[];
+  const risp = S.risposta && ex.risposta!==false;
+  // modo "attacco": la scala si sente una volta sola all'inizio, poi per ogni
+  // tonalita' suona solo la nota di partenza e il resto lo canti tu
+  const att = risp && S.modo==="attacco";
+  const giro = duraGiro(ex, spb);
   let t=0;
+
+  if(att){
+    // dimostrazione: il giro completo sulla prima tonalita'
+    t = spingiGiro(ev, ex, roots[0], 0, t, spb, true);
+    t += spb*2;
+  }
+
   roots.forEach((root,ri)=>{
-    const s0=t; let stepIdx=0;
-    if(ex.tipo==="scale"){
-      ex.pattern.forEach(([off,b])=>{
-        const d=b*spb;
-        ev.push({t,dur:d*(ex.staccato?.35:.94),midi:root+off,ri,si:stepIdx++,kind:"guida"});
-        t+=d;
-      });
-    } else if(ex.tipo==="glide"){
-      const d=ex.glide.beats*spb;
-      ev.push({t,dur:d,glide:[root+ex.glide.from,root+ex.glide.to],midi:root+ex.glide.from,ri,si:stepIdx++,kind:"guida"});
-      t+=d;
-      if(ex.glide.back){ ev.push({t,dur:d,glide:[root+ex.glide.to,root+ex.glide.from],midi:root+ex.glide.to,ri,si:stepIdx++,kind:"guida"}); t+=d; }
-    } else if(ex.tipo==="sustain"){
-      const d=ex.sustain.beats*spb;
-      ev.push({t,dur:d,midi:root+(ex.sustain.off||0),ri,si:stepIdx++,kind:"guida",dyn:ex.sustain.dyn});
-      t+=d;
-    }
-    const segLen=t-s0;
-    if(S.risposta && ex.risposta!==false){
-      ev.push({t,dur:segLen,ri,si:-1,kind:"canta",midi:root});
-      t+=segLen;
+    if(att){
+      const d=spb*1.5;
+      ev.push({t,dur:d*.9,midi:primaNota(ex,root),ri,si:0,kind:"guida",attacco:true});
+      t += d + spb*0.5;
+      if(S.click){
+        // il metronomo continua anche nel silenzio, cosi' tieni il tempo
+        let ct=t, bt=0;
+        while(ct < t+giro-1e-6){ ev.push({t:ct,kind:"clk",accent:bt===0,ri}); ct+=spb; bt++; }
+      }
+      ev.push({t,dur:giro,ri,si:-1,kind:"canta",midi:primaNota(ex,root),att:true});
+      t += giro;
+    }else{
+      t = spingiGiro(ev, ex, root, ri, t, spb, false);
+      if(risp){ ev.push({t,dur:giro,ri,si:-1,kind:"canta",midi:root}); t+=giro; }
     }
     t += spb*1;
   });
+  // la scaletta va sempre in ordine di tempo: il sequencer la legge in fila
+  ev.sort((a,b)=>a.t-b.t);
   return {tipo:ex.tipo,dur:t,ev,roots};
 }
 
@@ -1006,7 +1050,9 @@ function tick(){
     if(e.kind==="guida"){
       if(e.glide) playGlide(e.glide[0],e.glide[1],at,e.dur);
       else playNote(e.midi,at,e.dur,e.dyn);
-      if(S.click && P.ex.tipo==="scale") click(at,e.si===0);
+      if(S.click && P.ex.tipo==="scale" && !e.attacco) click(at,e.si===0);
+    }else if(e.kind==="clk"){
+      if(S.click) click(at,e.accent);
     }
   }
 }
@@ -1051,8 +1097,8 @@ function view(id){
 }
 function setState(k){
   const el=$("#pState"); el.className="state cond";
-  const txt={pronto:"PRONTO",ascolta:"ASCOLTA LA GUIDA",canta:"CANTA TU",libero:"SEGUI L'ISTRUZIONE",fine:"SEDUTA COMPLETATA",voce:"LA GUIDA TI SPIEGA"}[k]||"PRONTO";
-  if(k==="ascolta"||k==="voce") el.classList.add("ascolta");
+  const txt={pronto:"PRONTO",ascolta:"ASCOLTA LA GUIDA",canta:"CANTA TU",libero:"SEGUI L'ISTRUZIONE",fine:"SEDUTA COMPLETATA",voce:"LA GUIDA TI SPIEGA",scala:"ASCOLTA LA SCALA",attacco:"NOTA DI PARTENZA"}[k]||"PRONTO";
+  if(k==="ascolta"||k==="voce"||k==="scala"||k==="attacco") el.classList.add("ascolta");
   if(k==="canta") el.classList.add("canta");
   el.innerHTML=`<i class="dot"></i><span>${txt}</span>`;
 }
@@ -1096,17 +1142,20 @@ function paint(e,now){
     setState("canta");
     $("#pDisplay").innerHTML=`
       <div class="note cond dim">${midiIt(e.midi)}<sup>${midiEn(e.midi)}</sup></div>
-      <div class="sub">ripeti la scala appena sentita</div>
+      <div class="sub">${e.att?"parti da questa nota &middot; tonalit\u00e0 "+(e.ri+1)+" di "+P.tl.roots.length:"ripeti la scala appena sentita"}</div>
       <div class="syllabig cond">${ex.syl}</div>`;
     drawPiano(null);
     $("#pSteps").querySelectorAll("i").forEach(d=>d.className="");
     return;
   }
-  setState("ascolta");
+  setState(e.demo?"scala":(e.attacco?"attacco":"ascolta"));
   const m = e.glide ? Math.round(e.glide[0]+(e.glide[1]-e.glide[0])*Math.min(1,(now-e.t)/e.dur)) : e.midi;
+  const sub = e.demo ? "com\u2019\u00e8 fatto l\u2019esercizio \u00b7 ascolta e basta"
+            : e.attacco ? "tonalit\u00e0 "+(e.ri+1)+" di "+P.tl.roots.length+" \u00b7 attacca da qui"
+            : "tonalit\u00e0 "+(e.ri+1)+" di "+P.tl.roots.length+" \u00b7 fondamentale "+midiIt(P.tl.roots[e.ri])+" \u00b7 "+(Math.round(freq(m)*10)/10)+" Hz";
   $("#pDisplay").innerHTML=`
     <div class="note cond">${midiIt(m)}<sup>${midiEn(m)}</sup></div>
-    <div class="sub">tonalità ${e.ri+1} di ${P.tl.roots.length} · fondamentale ${midiIt(P.tl.roots[e.ri])} · ${Math.round(freq(m)*10)/10} Hz</div>
+    <div class="sub">${sub}</div>
     <div class="syllabig cond">${ex.syl}</div>`;
   drawPiano(m);
   const dots=$("#pSteps").querySelectorAll("i");
@@ -1215,6 +1264,14 @@ function renderSet(){
       <p class="note-help" style="margin-top:10px">La qualità dipende dalla voce italiana installata sul telefono. Su iPhone, in Impostazioni › Accessibilità › Contenuto pronunciato › Voci › Italiano, scarica una voce <b>Premium</b> o <b>Migliorata</b>: la differenza è netta e poi funziona anche senza rete.</p>
     </div>
     <div class="set">
+      <h4>Come ti guida</h4>
+      <p>Con <b>Solo l’attacco</b> senti la scala una volta sola all’inizio, poi per ogni tonalità suona solo la nota da cui partire e il resto lo canti tu.</p>
+      <div class="pick" id="pickModo">
+        <button data-m="attacco">Solo l’attacco</button>
+        <button data-m="guida">Scala intera</button>
+      </div>
+    </div>
+    <div class="set">
       <h4>Modo di lavoro</h4>
       <div class="rowset"><span>Ascolta, poi canta<small>Dopo ogni scala lascia un silenzio della stessa lunghezza per la tua risposta</small></span><button class="tog" data-tog="risposta"><i></i></button></div>
       <div class="rowset"><span>Nota di riferimento<small>Un bordone tiene la fondamentale mentre canti</small></span><button class="tog" data-tog="drone"><i></i></button></div>
@@ -1225,6 +1282,10 @@ function renderSet(){
   $("#v-set").querySelectorAll("[data-dec]").forEach(b=>b.onclick=()=>bump(b.dataset.dec,-1));
   $("#v-set").querySelectorAll("[data-inc]").forEach(b=>b.onclick=()=>bump(b.dataset.inc,+1));
   $("#pickTimbro").querySelectorAll("button").forEach(b=>b.onclick=()=>{S.timbro=b.dataset.t;saveS();syncSet();});
+  $("#pickModo").querySelectorAll("button").forEach(b=>b.onclick=()=>{
+    S.modo=b.dataset.m; saveS(); syncSet();
+    if(P.ex){ const era=P.playing; stop(false); P.tl=timeline(P.ex); renderPlayer(); if(era) play(); }
+  });
   $("#v-set").querySelectorAll("[data-vv]").forEach(b=>b.onclick=()=>{
     S.vvel=Math.max(0.7,Math.min(1.3,Math.round(((S.vvel||.98)+0.04*(+b.dataset.vv))*100)/100));
     saveS(); syncSet();
@@ -1249,6 +1310,7 @@ function bump(k,d){
 function syncSet(){
   ["floor","petto","misto","testa","sovt"].forEach(k=>{ const el=$("#v-"+k); if(el) el.textContent=midiIt(valOf(k))+" ("+midiEn(valOf(k))+")"; });
   $("#pickTimbro")?.querySelectorAll("button").forEach(b=>b.classList.toggle("on",b.dataset.t===S.timbro));
+  $("#pickModo")?.querySelectorAll("button").forEach(b=>b.classList.toggle("on",b.dataset.m===(S.modo||"attacco")));
   $("#v-set")?.querySelectorAll("[data-tog]").forEach(b=>b.classList.toggle("on",!!S[b.dataset.tog]));
   const vv=$("#v-vvel"); if(vv) vv.textContent=Math.round((S.vvel||.98)*100);
   const nv=$("#vNomeVoce");
